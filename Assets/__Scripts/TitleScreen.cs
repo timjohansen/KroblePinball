@@ -43,7 +43,7 @@ public class TitleScreen : MonoBehaviour
             pushStartText.rectTransform.localPosition = Vector3.Lerp(textStart, textEnd, invTime);
         }
 
-        if (Keyboard.current.spaceKey.wasPressedThisFrame)
+        if (Keyboard.current.spaceKey.wasPressedThisFrame || Touchscreen.current.primaryTouch.press.isPressed)
         {
             GM.inst.StartNewGame();
             gameObject.SetActive(false);

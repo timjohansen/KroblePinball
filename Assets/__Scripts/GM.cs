@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Events;
 using TMPro;
+using UnityEngine.InputSystem.Controls;
+using UnityEngine.InputSystem.EnhancedTouch;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using static EventSender;
@@ -82,13 +84,15 @@ public class GM : MonoBehaviour
     public SoundClipCollection soundClips = new SoundClipCollection();
     
     public ScoreLog scoreLog;
-    
+
     void Awake()
     {
         inst = this;
         
         _pauseEvent = new UnityEvent<bool>();
         board = GetComponent<Board>();
+        TouchSimulation.Enable();
+        
     }
     
     void Start()
@@ -229,27 +233,45 @@ public class GM : MonoBehaviour
         
         
         // TODO: clean up the flipper button logic
+
+        
+        bool leftButton = Keyboard.current.leftShiftKey.isPressed;
+        bool rightButton = Keyboard.current.rightShiftKey.isPressed;
+
+        for (int i = 0; i < Touchscreen.current.touches.Count; i++)
+        {
+            TouchControl touch = Touchscreen.current.touches[i];
+            if (touch.press.isPressed && touch.position.x.value < Screen.width / 2f)
+            {
+                leftButton = true;
+            }
+            else if (touch.press.isPressed && touch.position.x.value > Screen.width / 2f)
+            {
+                rightButton = true;
+            }
+        }
+        
         if (timeRemaining > 0f)
         {
-            if (!board.leftFlipperPressed && Keyboard.current.leftShiftKey.isPressed)
+            if (!board.leftFlipperPressed && leftButton)
             {
                 board.leftFlipperPressed = true;
                 PlaySound("flipper_up", false);
             }
 
-            if (!board.rightFlipperPressed && Keyboard.current.rightShiftKey.isPressed)
+            if (!board.rightFlipperPressed && rightButton)
             {
                 board.rightFlipperPressed = true;
                 PlaySound("flipper_up", false);
             }
 
-            if (board.leftFlipperPressed && !Keyboard.current.leftShiftKey.isPressed)
+            if (board.leftFlipperPressed && !leftButton)
             {
                 board.leftFlipperPressed = false;
                 PlaySound("flipper_down", false);
             }
 
-            if (board.rightFlipperPressed && !Keyboard.current.rightShiftKey.isPressed)
+            if (board.rightFlipperPressed && !rightButton)
             {
                 board.rightFlipperPressed = false;
                 PlaySound("flipper_down", false);
