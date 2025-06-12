@@ -7,13 +7,14 @@ using UnityEngine.InputSystem;
 
 public class Spinner : EventSender, ITriggerReceiver, INeedReset
 {
-
     public GameObject spinnerObj3D;
     public Transform axleTransform;
-    public TMP_Text valueText;
+    
     public float friction;
     public float hitVelocityMult;
     public int basePointValue;
+    public EventSender upgradeSender;
+    
     private int _level;
     private float _spinVelocity;
     private float _currentRotation;
@@ -26,6 +27,8 @@ public class Spinner : EventSender, ITriggerReceiver, INeedReset
     
     void Start()
     {
+        if (upgradeSender)
+            upgradeSender.GetBoardEvent().AddListener(Upgrade);
         _currentRotation = 0f;
         ResetForNewGame();
     }
@@ -77,8 +80,7 @@ public class Spinner : EventSender, ITriggerReceiver, INeedReset
 
         if (testMode && Keyboard.current.iKey.wasPressedThisFrame)
         {
-            print("Upgrade");
-            Upgrade(1);    
+            Trigger();    
         }
     }
     
@@ -95,13 +97,34 @@ public class Spinner : EventSender, ITriggerReceiver, INeedReset
         boardEvent.Invoke(pointEventInfo);
         boardEvent.Invoke(new EventInfo(this, EventType.PlaySoundNoReverb, "spinner_points"));
     }
+
+    private void Upgrade(EventInfo eventInfo)
+    {
+        if (eventInfo.Type != EventType.Trigger)
+        {
+            return;
+        }
+        Upgrade(1);
+    }
     public void Upgrade(int levels)
     {
         SetLevel(_level + levels);
-        if (valueText)
-        {
-            valueText.text = valueText.text = (basePointValue * (_level + 1)).ToString();
-        }
+
+        DotMatrixDisplay.Message message = new DotMatrixDisplay.Message(
+            new DotMatrixDisplay.DmdAnim[]
+            {
+
+                new (DotMatrixDisplay.AnimType.ScrollInOut, 
+                    DotMatrixDisplay.AnimOrient.Horizontal,
+                    2f, 0, "Spinners", TextureWrapMode.Clamp),
+                
+                new (DotMatrixDisplay.AnimType.ScrollInOut, 
+                    DotMatrixDisplay.AnimOrient.Horizontal,
+                    2f, 0, "Upgraded", TextureWrapMode.Clamp),
+            }
+        );
+        boardEvent.Invoke(new EventInfo(this, EventType.ShowMessage, message));
+        boardEvent.Invoke(new EventInfo(this, EventType.PlaySoundNoReverb, "level_up_1"));
     }
 
     void SetLevel(int newLevel)

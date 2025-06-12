@@ -5,9 +5,10 @@ using UnityEngine.Serialization;
 
 public class ColorCurve : EventSender, INeedReset
 {
-    
+
+    private int _level;
     public int currentValue;
-    public int maxValue;
+    int _maxValue;
     private Material _mat;
     private static readonly int Percentage = Shader.PropertyToID("_Percentage");
     public EventSender incrementTrigger;
@@ -24,6 +25,8 @@ public class ColorCurve : EventSender, INeedReset
     public void ResetForNewGame()
     {
         currentValue = 0;
+        _level = 1;
+        _maxValue = _level * 8;
         UpdateMaterial();
     }
 
@@ -31,16 +34,18 @@ public class ColorCurve : EventSender, INeedReset
     {
         if (info.Type != EventType.Trigger)
             return;
-        if (currentValue % 2 == 1)
+        if (currentValue % _level == 0)
         {
-            boardEvent.Invoke(new EventInfo(this, EventType.PlaySound, progressSounds[currentValue / 2]));    
+            boardEvent.Invoke(new EventInfo(this, EventType.PlaySound, progressSounds[currentValue / _level]));    
         }
         
         currentValue++;
         
-        if (currentValue == maxValue)
+        if (currentValue == _maxValue)
         {
             boardEvent.Invoke(new EventInfo(this, EventType.Trigger, null));
+            _level++;
+            _maxValue = _level  * 8;
             currentValue = 0;
         }
         UpdateMaterial();
@@ -48,6 +53,6 @@ public class ColorCurve : EventSender, INeedReset
 
     private void UpdateMaterial()
     {
-        _mat.SetFloat(Percentage, (float)currentValue / maxValue);
+        _mat.SetFloat(Percentage, (float)currentValue / _maxValue);
     }
 }

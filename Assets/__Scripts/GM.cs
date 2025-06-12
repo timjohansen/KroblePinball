@@ -163,7 +163,7 @@ public class GM : MonoBehaviour
             _timeAdditionTimer -= Time.deltaTime;
             if (_timeAdditionTimer <= 0f)
             {
-                if (_timeSecondsToAdd > 10 && _timeSecondsToAdd % 10 == 0)
+                if (_timeSecondsToAdd > 10 || _timeSecondsToAdd % 10 == 0)
                 {
                     timeRemaining += 10f;
                     _timeSecondsToAdd -= 10;
