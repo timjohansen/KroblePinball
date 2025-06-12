@@ -44,7 +44,7 @@ public class GameOver : MonoBehaviour
             scoreText.rectTransform.localPosition = Vector3.Lerp(textStart, textEnd, invTime);
         }
 
-        if (Keyboard.current.anyKey.wasPressedThisFrame || Touchscreen.current.primaryTouch.press.isPressed)
+        if (GM.inst.inputMan.anyKeyPressed)
         {
             GM.inst.StartNewGame();
             gameObject.SetActive(false);

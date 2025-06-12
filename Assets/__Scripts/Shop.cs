@@ -87,7 +87,7 @@ public class Shop : EventSender
         switch (_state)
         {
             case ShopState.Open:
-                if (Keyboard.current.leftShiftKey.wasPressedThisFrame)
+                if (GM.inst.inputMan.leftFlipperAction.action.WasPressedThisFrame())
                 {
                     if (_selectedSlot == 0)
                     {
@@ -99,12 +99,12 @@ public class Shop : EventSender
                     }
                     selector.rectTransform.anchoredPosition = new Vector2(_firstSlotXPos + _slotSpacing * _selectedSlot, selector.rectTransform.anchoredPosition.y);
                 }
-                else if (Keyboard.current.rightShiftKey.wasPressedThisFrame)
+                else if (GM.inst.inputMan.rightFlipperAction.action.WasPressedThisFrame())
                 {
                     _selectedSlot = (_selectedSlot + 1) % 3;
                     selector.rectTransform.anchoredPosition = new Vector2(_firstSlotXPos + _slotSpacing * _selectedSlot, selector.rectTransform.anchoredPosition.y);
                 }
-                else if (Keyboard.current.spaceKey.wasPressedThisFrame)
+                else if (Keyboard.current.spaceKey.wasPressedThisFrame) // TODO: make this work on other devices
                 {
                     if (_slotSold[_selectedSlot])
                     {

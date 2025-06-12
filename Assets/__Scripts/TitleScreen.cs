@@ -12,6 +12,7 @@ public class TitleScreen : MonoBehaviour
     private RectTransform _myRect;
     public Image logo;
     public TMPro.TMP_Text pushStartText;
+    public TMPro.TMP_Text controlsText;
     private float _animInTimer;
     
     private float _logoEndYPos = 100f;
@@ -21,6 +22,17 @@ public class TitleScreen : MonoBehaviour
         _animInTimer = 1f;
         _canvasRect = GetComponentInParent<Canvas>().GetComponent<RectTransform>();
         _myRect = GetComponent<RectTransform>();
+
+        if (Touchscreen.current == null || !Application.isMobilePlatform)
+        {
+            pushStartText.text = "Tap To Start";
+            controlsText.gameObject.SetActive(false);
+        }
+        else
+        {
+            pushStartText.text = "Press any key to start";
+            controlsText.gameObject.SetActive(true);
+        }
     }
     
     void Update()
@@ -43,7 +55,7 @@ public class TitleScreen : MonoBehaviour
             pushStartText.rectTransform.localPosition = Vector3.Lerp(textStart, textEnd, invTime);
         }
 
-        if (Keyboard.current.spaceKey.wasPressedThisFrame || Touchscreen.current.primaryTouch.press.isPressed)
+        if (GM.inst.inputMan.anyKeyPressed)
         {
             GM.inst.StartNewGame();
             gameObject.SetActive(false);

@@ -36,7 +36,6 @@ public class GM : MonoBehaviour
     
     public MaterialSwapper saverGraphic;
     
-    // public Material[] levelMats = new Material[10];
     public Color[] levelColors = new Color[10];
     
     private int _currentScore = 0;
@@ -72,7 +71,7 @@ public class GM : MonoBehaviour
     private float _ballMultDecayRate = 1f;
     private int _ballMultMaxedOutBonus = 5000;
     
-    private float _nudgeStrength = 1f;      // Shop upgrade
+    private float _nudgeStrength = 1.5f;      // Shop upgrade
     private float _initialNudgeCooldown = .5f;    // Shop upgrade
     private float _nudgeCooldown;
 
@@ -84,17 +83,25 @@ public class GM : MonoBehaviour
     public SoundClipCollection soundClips = new SoundClipCollection();
     
     public ScoreLog scoreLog;
+    public InputMan inputMan;
+    public TouchCanvas touchCanvas;
+    private CameraController _cameraController;
 
     void Awake()
     {
         inst = this;
-        
+
         _pauseEvent = new UnityEvent<bool>();
         board = GetComponent<Board>();
-        TouchSimulation.Enable();
+        inputMan = GetComponent<InputMan>();
+        _cameraController = FindObjectOfType<CameraController>();
         
+        Screen.autorotateToPortrait = false;
+        Screen.autorotateToPortraitUpsideDown = false;
+        Screen.orientation = ScreenOrientation.AutoRotation;
     }
-    
+
+
     void Start()
     {
         EventSender[] senders = FindObjectsByType<EventSender>(FindObjectsSortMode.None);
@@ -123,23 +130,15 @@ public class GM : MonoBehaviour
     
     void Update()
     {
-        if (Keyboard.current.fKey.wasPressedThisFrame)
-        {
-            Screen.fullScreen = !Screen.fullScreen;
-        }
-
-        if (Keyboard.current.escapeKey.wasPressedThisFrame)
-        {
-            Screen.fullScreen = false;
-        }
-        if (Keyboard.current.mKey.wasPressedThisFrame)
+        if (inputMan.musicTogglePressed)
         {
             musicSource.mute = !musicSource.mute;
+            touchCanvas.SetMusicIconState(musicSource.mute);
         }
-        if (Keyboard.current.sKey.wasPressedThisFrame)
+
+        if (inputMan.fullscreenPressed)
         {
-            audioSource.mute = !audioSource.mute;
-            audioSourceNoReverb.mute = !audioSourceNoReverb.mute;
+            Screen.fullScreen = !Screen.fullScreen;
         }
         
         if (mode == GameMode.Shop) 
@@ -233,45 +232,28 @@ public class GM : MonoBehaviour
         
         
         // TODO: clean up the flipper button logic
-
-        
-        bool leftButton = Keyboard.current.leftShiftKey.isPressed;
-        bool rightButton = Keyboard.current.rightShiftKey.isPressed;
-
-        for (int i = 0; i < Touchscreen.current.touches.Count; i++)
-        {
-            TouchControl touch = Touchscreen.current.touches[i];
-            if (touch.press.isPressed && touch.position.x.value < Screen.width / 2f)
-            {
-                leftButton = true;
-            }
-            else if (touch.press.isPressed && touch.position.x.value > Screen.width / 2f)
-            {
-                rightButton = true;
-            }
-        }
         
         if (timeRemaining > 0f)
         {
-            if (!board.leftFlipperPressed && leftButton)
+            if (!board.leftFlipperPressed && inputMan.leftFlipperPressed)
             {
                 board.leftFlipperPressed = true;
                 PlaySound("flipper_up", false);
             }
 
-            if (!board.rightFlipperPressed && rightButton)
+            if (!board.rightFlipperPressed && inputMan.rightFlipperPressed)
             {
                 board.rightFlipperPressed = true;
                 PlaySound("flipper_up", false);
             }
 
-            if (board.leftFlipperPressed && !leftButton)
+            if (board.leftFlipperPressed && !inputMan.leftFlipperPressed)
             {
                 board.leftFlipperPressed = false;
                 PlaySound("flipper_down", false);
             }
 
-            if (board.rightFlipperPressed && !rightButton)
+            if (board.rightFlipperPressed && !inputMan.rightFlipperPressed)
             {
                 board.rightFlipperPressed = false;
                 PlaySound("flipper_down", false);
@@ -291,13 +273,7 @@ public class GM : MonoBehaviour
             }
         }
         
-        
-        
-        if (Keyboard.current.pKey.wasPressedThisFrame)
-        {
-            Debug.Break();
-        }
-        
+       
         Vector2 nudgeVector = Vector2.zero;
         if (_nudgeCooldown > 0f)
         {
@@ -313,23 +289,26 @@ public class GM : MonoBehaviour
         }
         else
         {
-            if (Keyboard.current.leftArrowKey.wasPressedThisFrame)
+            if (inputMan.leftNudgePressed)
             {
                 nudgeVector = Vector2.left;
                 _nudgeCooldown = _initialNudgeCooldown;
                 nudgeCooldownImage.gameObject.SetActive(true);
+                _cameraController.Nudge(nudgeVector);
             }
-            else if (Keyboard.current.rightArrowKey.wasPressedThisFrame)
+            else if (inputMan.rightNudgePressed)
             {
                 nudgeVector = Vector2.right;
                 _nudgeCooldown = _initialNudgeCooldown;
                 nudgeCooldownImage.gameObject.SetActive(true);
+                _cameraController.Nudge(nudgeVector);
             }
-            else if (Keyboard.current.upArrowKey.wasPressedThisFrame)
+            else if (inputMan.upNudgePressed)
             {
                 nudgeVector = Vector2.up;
                 _nudgeCooldown = _initialNudgeCooldown;
                 nudgeCooldownImage.gameObject.SetActive(true);
+                _cameraController.Nudge(nudgeVector);
             }
 
             foreach (GameObject ball in ballDispenser.GetActiveBalls())
