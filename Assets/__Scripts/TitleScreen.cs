@@ -23,7 +23,7 @@ public class TitleScreen : MonoBehaviour
         _canvasRect = GetComponentInParent<Canvas>().GetComponent<RectTransform>();
         _myRect = GetComponent<RectTransform>();
 
-        if (Touchscreen.current == null || !Application.isMobilePlatform)
+        if (Touchscreen.current != null || Application.isMobilePlatform)
         {
             pushStartText.text = "Tap To Start";
             controlsText.gameObject.SetActive(false);
