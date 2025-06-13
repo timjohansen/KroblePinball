@@ -25,7 +25,7 @@ public class Bumper : EventSender, ICollisionReceiver
 
         if (collision.gameObject.CompareTag("Ball"))
         {
-            if (collision.collider.gameObject.GetComponentInParent<Ball>().currentSpeed <= minimumIncomingVelocity)
+            if (collision.collider.gameObject.GetComponentInParent<Ball>().speed <= minimumIncomingVelocity)
             {
                 return;
             }

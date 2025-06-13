@@ -2,21 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 public class UpgradableChute : EventSender, INeedReset
 {
-    public EventSender trigger;
+    public EventSender progressTrigger;
     public ArrowLights lights;
+
+    public int scoreBase;
+    public float scoreMultiplierPerLevel;
+    public bool testMode;
     
     private int _level;
     private int _stage;
     private float _resetTimer;
-
-    public bool testModePressA;
     
     void Start()
     {
-        trigger.GetBoardEvent().AddListener(OnTriggerEvent);
+        progressTrigger.GetBoardEvent().AddListener(OnProgressEvent);
     }
 
     public void ResetForNewGame()
@@ -28,10 +31,11 @@ public class UpgradableChute : EventSender, INeedReset
 
     void Update()
     {
-        if (testModePressA && Keyboard.current.aKey.wasPressedThisFrame)
+        if (testMode && Keyboard.current.aKey.wasPressedThisFrame)
         {
-            OnTriggerEvent(null);
+            OnProgressEvent(new EventInfo(EventType.Trigger));
         }
+        
         if (_stage == 3)
         {
             _resetTimer -= Time.deltaTime;
@@ -43,24 +47,32 @@ public class UpgradableChute : EventSender, INeedReset
         }
     }
 
-    void OnTriggerEvent(EventInfo info)
+    void OnProgressEvent(EventInfo info)
     {
+        if (info.Type != EventType.Trigger)
+            return;
+        if (_stage == 3)
+            return;
+        
+        EventInfo pointInfo = new EventInfo(this, EventType.AddPoints)
+        {
+            Position3D = lights.transform.position
+        };
         _stage++;
-        EventInfo pointInfo = new EventInfo(this, EventType.AddPoints);
-        pointInfo.Position3D = lights.transform.position;
+        int pointValue;
         if (_stage == 3)
         {
-            pointInfo.Data = 1000 * (_level + 1);
-            boardEvent.Invoke(pointInfo);
+            pointValue = (int)(scoreBase * (1f + _level * scoreMultiplierPerLevel) * 2f);
             Upgrade(1);
-            _stage = 0;
         }
         else
         {
-            pointInfo.Data = 500 * (_level + 1);
-            boardEvent.Invoke(pointInfo);
+            pointValue = (int)(scoreBase * (1f + _level * scoreMultiplierPerLevel));
             boardEvent.Invoke(new EventInfo(this, EventType.PlaySound, "ascending_blips_1"));
         }
+
+        pointInfo.Data = pointValue;
+        boardEvent.Invoke(pointInfo);
         lights.SetLightStage(_stage);
     }
     
@@ -74,12 +86,9 @@ public class UpgradableChute : EventSender, INeedReset
         DotMatrixDisplay.Message message = new DotMatrixDisplay.Message(
             new DotMatrixDisplay.DmdAnim[]
             {
-                new (DotMatrixDisplay.AnimType.ScrollIn, 
+                new (DotMatrixDisplay.AnimType.ScrollInOut, 
                     DotMatrixDisplay.AnimOrient.Vertical,
-                    .1f, 3, "Chutes", TextureWrapMode.Repeat),
-                new(DotMatrixDisplay.AnimType.Hold, 
-                    DotMatrixDisplay.AnimOrient.Vertical,
-                    1f, 0, "Chutes", TextureWrapMode.Repeat),
+                    .2f, 3, "Chutes", TextureWrapMode.Repeat),
                 new(DotMatrixDisplay.AnimType.Hold, 
                     DotMatrixDisplay.AnimOrient.Vertical,
                     2f, 0, "Upgraded", TextureWrapMode.Repeat),

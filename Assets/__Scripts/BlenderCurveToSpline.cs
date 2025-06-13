@@ -6,6 +6,8 @@ using Unity.Mathematics;
 
 public class BlenderCurveToSpline : MonoBehaviour
 {
+    // Converts a text file exported from Blender with BezierExporter.py into a Unity spline object
+    
     public TextAsset sourceTextFile;
     public bool clickToUpdate;
     private void OnValidate()
@@ -35,7 +37,7 @@ public class BlenderCurveToSpline : MonoBehaviour
         }
 
         SplineContainer sp = GetComponent<SplineContainer>();
-        if (sp == null)
+        if (!sp)
         {
             sp = gameObject.AddComponent<SplineContainer>();
         }
@@ -48,6 +50,5 @@ public class BlenderCurveToSpline : MonoBehaviour
 
         sp.Spline = newSpline;
         gameObject.name = sourceTextFile.name;
-
     }
 }

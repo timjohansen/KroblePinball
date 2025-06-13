@@ -62,7 +62,7 @@ public class SlotMachine : EventSender
             {
                 if (!sender)
                     continue;
-                sender.ResetState();
+                sender.ExternalReset();
             }
             
             if (_leftReelValue == _centerReelValue && _leftReelValue == _rightReelValue)

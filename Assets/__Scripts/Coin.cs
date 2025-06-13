@@ -6,19 +6,24 @@ using UnityEngine.Events;
 public class Coin : EventSender
 
 {
-    UnityEvent<int> _pickupEvent = new UnityEvent<int>();    
-    RolloverTrigger _pickupTrigger;
-    bool _collected;
-    public int groupNum;
+    public GameObject pickupTriggerPrefab;
+    public int groupNum; // Not currently used, but here in case there's ever a need to identify a coin's origin
+
+    private UnityEvent<int> _pickupEvent = new UnityEvent<int>();
+    private GameObject _pickupTriggerInst;
+    private bool _collected;
+
 
     void Start()
     {
         Vector3 offset = GM.inst.offset2D;
-        Vector3 triggerPos = new(transform.position.x + offset.x, transform.position.z + offset.z, transform.position.y + offset.y);
-        _pickupTrigger = Instantiate(GM.inst.simpleTriggerPrefab, triggerPos, Quaternion.identity).GetComponent<RolloverTrigger>();
-        _pickupTrigger.GetBoardEvent().AddListener(Collect);
+        Vector3 triggerPos = 
+            new(transform.position.x + offset.x, transform.position.z + offset.z, transform.position.y + offset.y);
+        _pickupTriggerInst =
+            Instantiate(pickupTriggerPrefab, triggerPos, Quaternion.identity);
+        _pickupTriggerInst.GetComponent<RolloverTrigger>().GetBoardEvent().AddListener(Collect);
     }
-    
+
     void Update()
     {
         transform.Rotate(transform.up, 50f * Time.deltaTime);
@@ -30,15 +35,16 @@ public class Coin : EventSender
         {
             return;
         }
+
         if (_collected)
         {
-            Debug.LogError("Attempted to collect already collected token", gameObject);
+            Debug.LogWarning("Attempted to collect already collected token", gameObject);
             return;
         }
+
         _pickupEvent.Invoke(groupNum);
         _collected = true;
         DestroySelf();
-        
     }
 
     public UnityEvent<int> GetPickupEvent()
@@ -63,15 +69,14 @@ public class Coin : EventSender
             DestroySelf();
         }
     }
-    
+
     void DestroySelf()
     {
-        if (_pickupTrigger)
+        if (_pickupTriggerInst)
         {
-            Destroy(_pickupTrigger.gameObject);
+            Destroy(_pickupTriggerInst.gameObject);
         }
+
         Destroy(gameObject);
-        
     }
-    
 }

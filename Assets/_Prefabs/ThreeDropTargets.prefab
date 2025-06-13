@@ -273,7 +273,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 749d6969e70b14d929c4e251b2c5d725, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  receiverObject: {fileID: 8582976310269836333}
+  collisionReceiver: {fileID: 0}
 --- !u!1001 &5522633055215128385
 PrefabInstance:
   m_ObjectHideFlags: 0

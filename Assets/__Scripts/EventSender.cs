@@ -6,6 +6,9 @@ using UnityEngine.Events;
 
 public abstract class EventSender : MonoBehaviour
 {
+    // A universal base class for any object that communicates with events. The GM automatically subscribes to all
+    // EventSenders at the start of the game, but all others are performed manually.
+    
     protected UnityEvent<EventInfo> boardEvent;
 
     protected virtual void Awake()
@@ -18,33 +21,14 @@ public abstract class EventSender : MonoBehaviour
         return boardEvent;
     }
 
-    public virtual void ResetState()
+    public virtual void ExternalReset()
     {
-        // Does nothing by default
-        // TODO: decide if this is worth keeping
+        // Does nothing by default, but can be used by a receiver to reset the sender back to its normal state if
+        // being triggered involves multiple states. For example, if lighting all toggleable lights 
+        // starts a slot machine, this could be used to keep the letters in a blinking animation until the slot machine
+        // finishes spinning before switching the lights back off.
     }
-
-    public virtual void SetFirstMaterial(Material newMat)
-    {
-        ObjectLink objLink = GetComponent<ObjectLink>();
-        if (objLink)
-        {
-            MeshRenderer mr = objLink.obj3D.GetComponentInChildren<MeshRenderer>();
-            if (mr != null)
-            {
-                mr.material = newMat;
-                return;
-            }
-            SkinnedMeshRenderer smr = objLink.obj3D.GetComponentInChildren<SkinnedMeshRenderer>();
-            if (smr)
-            {
-                smr.material = newMat;
-                return;
-            }
-        }
-        Debug.LogError("ObjectLink not found when attempting to set material", gameObject);
-    }
-
+    
     public enum EventType
     {
         Trigger, AddPoints, AddPointsNoMult, AddCoins, AddSeconds, AddBallMult, PlaySound, PlaySoundNoReverb, 

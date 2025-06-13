@@ -24,31 +24,31 @@ public class DropTargets : EventSender, ICollisionReceiver, INeedReset
         _downZ = _upZ - 0.155f;
     }
     
-    void Start()
+    private void Start()
     {        
         ResetForNewGame();
     }
 
     public void ResetForNewGame()
     {
-        ResetState();
+        RaiseAll();
     }
 
-    void Drop(int index)
+    private void Drop(int index)
     {
         Vector3 pos = targetBones[index].transform.localPosition;        
         targetBones[index].transform.localPosition = new Vector3(pos.x, pos.y, _downZ);
         UpdateMaterials();
     }
 
-    void Raise(int index)
+    private void Raise(int index)
     {
         Vector3 pos = targetBones[index].transform.localPosition;        
         targetBones[index].transform.localPosition = new Vector3(pos.x, pos.y, _upZ);
         UpdateMaterials();
     }
 
-    public override void ResetState()
+    private void RaiseAll()
     {
         for (int i = 0; i < targetCols.Length; i++)
         {
@@ -59,7 +59,7 @@ public class DropTargets : EventSender, ICollisionReceiver, INeedReset
         UpdateMaterials();
     }
 
-    protected void UpdateMaterials()
+    private void UpdateMaterials()
     {
         List<Material> matList = new();
         targetObj.GetMaterials(matList);
@@ -137,7 +137,7 @@ public class DropTargets : EventSender, ICollisionReceiver, INeedReset
         if (allDown)
         {
             boardEvent.Invoke(new EventInfo(this, EventType.Trigger, name));
-            ResetState();
+            RaiseAll();
         }
     }
     public void ReceiveOnCollisionExit2D(Collision2D collision)

@@ -7,12 +7,13 @@ public class Ball2D : MonoBehaviour
 {
     private Ball _parentBall;
 
-    void Start()
+
+    private void Awake()
     {
         _parentBall = GetComponentInParent<Ball>();
     }
     
-    void OnCollisionEnter2D(Collision2D collision)
+    /*private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Flipper"))
         {
@@ -25,7 +26,5 @@ public class Ball2D : MonoBehaviour
         {
             _parentBall.touchingFlipper = false;
         }
-    }
-
-
+    }*/
 }

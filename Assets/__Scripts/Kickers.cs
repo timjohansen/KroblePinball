@@ -7,22 +7,22 @@ using UnityEngine.Serialization;
 
 public class Kickers : EventSender, INeedReset
 {
-    public GameObject leftCap3D;
-    public GameObject rightCap3D;
-
-    public GameObject leftCap2D;
-    public GameObject rightCap2D;
-
+    // Handles launching balls out of the outlanes. 
+    
+    public ObjectLink leftCap;
+    public ObjectLink rightCap;
+    public EventSender capOpenTrigger;
+    public EventSender leftKickTrigger;
+    public EventSender rightKickTrigger;
+    
+    // Time before the caps close after kicker fires. Collider effectors allow the ball
+    // to pass through regardless, so this is just for visual effect.
     public float closeTimerLength;
     private float _leftCloseTimer;
     private float _rightCloseTimer;
-
-    [FormerlySerializedAs("capOpenEvent")] public EventSender capOpenTrigger;
-    [FormerlySerializedAs("leftKickEvent")] public EventSender leftKickTrigger;
-    [FormerlySerializedAs("rightKickEvent")] public EventSender rightKickTrigger;
-
-    public float kickStrength = 600f;
-    public bool testModePressKToTrigger;
+    
+    public float kickStrength = 1000f;
+    public bool testMode;
 
     private void Start()
     {
@@ -35,79 +35,93 @@ public class Kickers : EventSender, INeedReset
     {
         _leftCloseTimer = 0f;
         _rightCloseTimer = 0f;
-        SetCapClosed("left", true);
-        SetCapClosed("right", true);
+        SetCapState("left", true);
+        SetCapState("right", true);
     }
 
     private void Update()
     {
-        if (testModePressKToTrigger && Keyboard.current.kKey.wasPressedThisFrame)
+#if (UNITY_EDITOR)
+        if (testMode && Keyboard.current.kKey.wasPressedThisFrame)
         {
             OnOpenCapsEvent(new EventInfo(this, EventType.Trigger));
         }
+#endif
 
         if (_leftCloseTimer > 0f)
         {
-            _leftCloseTimer -= Time.deltaTime;
-            if (_leftCloseTimer < 0f)
+            _leftCloseTimer = Mathf.MoveTowards(_leftCloseTimer, 0f, Time.deltaTime);
+            if (_leftCloseTimer <= 0f)
             {
-                SetCapClosed("left", true);
+                SetCapState("left", true);
             }
         }
         if (_rightCloseTimer > 0f)
         {
-            _rightCloseTimer -= Time.deltaTime;
-            if (_rightCloseTimer < 0f)
+            _rightCloseTimer = Mathf.MoveTowards(_rightCloseTimer, 0f, Time.deltaTime);
+            if (_rightCloseTimer <= 0f)
             {
-                SetCapClosed("right", true);
+                SetCapState("right", true);
             }
         }
     }
 
-    private void SetCapClosed(string side, bool state)
+    private void SetCapState(string side, bool state)
     {
         if (side == "left")
         {
-            leftCap2D.SetActive(state);
-            leftCap3D.SetActive(state);
+            leftCap.obj2D.SetActive(state);
+            leftCap.obj3D.SetActive(state);
         }
         else if (side == "right")
         {
-            rightCap2D.SetActive(state);
-            rightCap3D.SetActive(state);
+            rightCap.obj2D.SetActive(state);
+            rightCap.obj3D.SetActive(state);
         }
     }
 
     private void BallEnteredLeft(EventInfo info){
-        if (info.Type != EventType.Trigger)
-        {
+        if (info.Type != EventType.Trigger || info.Data == null)
             return;
-        }
-        GameObject ball = (GameObject)info.Data;
-        ball.GetComponentInParent<Ball>().AddImpulseForce(new Vector2(0f, kickStrength));
+        
+        GameObject ballObj = (GameObject)info.Data;
+        if (!ballObj)
+            return;
+
+        Ball ball = ballObj.GetComponentInParent<Ball>();
+        if (!ball)
+            return;
+        
+        ball.AddImpulseForce(new Vector2(0f, kickStrength));
         _leftCloseTimer = closeTimerLength;
         boardEvent.Invoke(new EventInfo(this, EventType.PlaySound, "plunger"));
     }
 
     private void BallEnteredRight(EventInfo info){
-        if (info.Type != EventType.Trigger)
-        {
+        if (info.Type != EventType.Trigger || info.Data == null)
             return;
-        }
-        GameObject ball = (GameObject)info.Data;
-        ball.GetComponentInParent<Ball>().AddImpulseForce(new Vector2(0f, kickStrength));
+        
+        GameObject ballObj = (GameObject)info.Data;
+        if (!ballObj)
+            return;
+
+        Ball ball = ballObj.GetComponentInParent<Ball>();
+        if (!ball)
+            return;
+        
+        ball.AddImpulseForce(new Vector2(0f, kickStrength));
         _rightCloseTimer = closeTimerLength;
         boardEvent.Invoke(new EventInfo(this, EventType.PlaySound, "plunger"));
     }
 
     private void OnOpenCapsEvent(EventInfo info)
     {
-        if (info.Type != EventSender.EventType.Trigger)
+        if (info.Type != EventType.Trigger)
         {
             return;
         }
-        SetCapClosed("left", false);
-        SetCapClosed("right", false);
+        SetCapState("left", false);
+        SetCapState("right", false);
         
         boardEvent.Invoke(new EventInfo(this, EventType.PlaySoundNoReverb, "success_minor"));
         DotMatrixDisplay.Message message = new DotMatrixDisplay.Message(

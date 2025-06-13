@@ -3,23 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
-
+using UnityEngine.Serialization;
 
 
 public class ToggleableLetters : EventSender, INeedReset
 {
-    public bool waitForExternalReset;
-    public bool canBeToggledOff;
+    public bool waitForExternalReset;   // Wait for an external signal before resetting after completion?
+    public bool canBeToggledOff;        // Will rolling over a lit letter turn it off? 
     
-    public MeshRenderer letterRenderer;
-    public Material on_mat;
-    public Material off_mat;
+    public RolloverTrigger[] letterTriggers;
+    public Material onMat;
+    public Material offMat;
     public AudioClip onSound;
     public AudioClip offSound;
     
-    protected bool[] letterIsLit;
-    public RolloverTrigger[] letterTriggers;
-
+    private Renderer _letterRenderer;
+    private AudioSource _audioSource;
+    protected bool[] _letterIsLit;
     private bool _allLit;
     private float _timeUntilReset;
     private float _blinkTimer;
@@ -27,7 +27,9 @@ public class ToggleableLetters : EventSender, INeedReset
     
     private void Start()
     {
-        letterIsLit = new bool[letterTriggers.Length];
+        _letterRenderer = GetComponent<Renderer>();
+        _audioSource = GetComponent<AudioSource>();
+        _letterIsLit = new bool[letterTriggers.Length];
         for (int i = 0; i < letterTriggers.Length; i++)
         {
             letterTriggers[i].GetBoardEvent().AddListener(LetterTriggered);
@@ -47,9 +49,9 @@ public class ToggleableLetters : EventSender, INeedReset
             _blinkTimer += Time.deltaTime;
             if (_blinkTimer > _blinkRate)
             {
-                for (int i = 0; i < letterIsLit.Length; i++)
+                for (int i = 0; i < _letterIsLit.Length; i++)
                 {
-                    letterIsLit[i] = !letterIsLit[i];
+                    _letterIsLit[i] = !_letterIsLit[i];
                 }
                 _blinkTimer %= _blinkRate;
                 UpdateMaterials();
@@ -59,7 +61,7 @@ public class ToggleableLetters : EventSender, INeedReset
                 _timeUntilReset -= Time.deltaTime;
                 if (_timeUntilReset <= 0f)
                 {
-                    ResetState();
+                    ExternalReset();
                 }
             }
         }
@@ -82,32 +84,36 @@ public class ToggleableLetters : EventSender, INeedReset
     protected virtual void LetterTriggered(EventInfo info)
     {
         if (_allLit)
-        {
             return;
-        }
+        
+        if (info.Type != EventType.Trigger || info.Data == null)
+            return;
+        
         int index = (int)info.Data;
+        
         if (canBeToggledOff)
         {
-            letterIsLit[index] = !letterIsLit[index];
+            _letterIsLit[index] = !_letterIsLit[index];
         }
         else
         {
-            letterIsLit[index] = true;
+            _letterIsLit[index] = true;
         }
 
-        if (onSound && letterIsLit[index])
+        if (_audioSource)
         {
-            boardEvent.Invoke(new EventInfo(this, EventType.PlaySoundNoReverb, onSound));
-        }
-        else if (offSound && !letterIsLit[index])
-        {
-            boardEvent.Invoke(new EventInfo(this, EventType.PlaySoundNoReverb, offSound));
+            if (onSound && _letterIsLit[index])
+            {
+                _audioSource.PlayOneShot(onSound);
+            }
+            else if (offSound && !_letterIsLit[index])
+            {
+                _audioSource.PlayOneShot(offSound);
+            }
         }
         
-        UpdateMaterials();
         _allLit = true;
-
-        foreach (bool lit in letterIsLit)
+        foreach (bool lit in _letterIsLit)
         {
             if (!lit)
             {
@@ -119,44 +125,37 @@ public class ToggleableLetters : EventSender, INeedReset
         {
             AllLit();
         }
+        UpdateMaterials();
     }
 
     protected void UpdateMaterials()
     {
         List<Material> matList = new();
-        foreach (bool letter in letterIsLit)
+        foreach (bool lit in _letterIsLit)
         {
-            if (letter)
-            {
-                matList.Add(on_mat);
-            }
-            else
-            {
-                matList.Add(off_mat);
-            }
+            matList.Add(lit ? onMat : offMat);
         }
-
-        letterRenderer.SetMaterials(matList);
+        _letterRenderer.SetMaterials(matList);
     }
 
     protected void ShiftRight()
     {
-        bool temp = letterIsLit[^1];    // Store the rightmost value
-        for (int i = letterIsLit.Length - 2; i >= 0; i--)
+        bool temp = _letterIsLit[^1];    // Store the rightmost value
+        for (int i = _letterIsLit.Length - 2; i >= 0; i--)
         {
-            letterIsLit[i + 1] = letterIsLit[i];
+            _letterIsLit[i + 1] = _letterIsLit[i];
         }
-        letterIsLit[0] = temp;
+        _letterIsLit[0] = temp;
     }
 
     protected void ShiftLeft()
     {
-        bool temp = letterIsLit[0];
-        for (int i = 0; i  < letterIsLit.Length - 1; i ++)
+        bool temp = _letterIsLit[0];
+        for (int i = 0; i  < _letterIsLit.Length - 1; i ++)
         {
-            letterIsLit[i] = letterIsLit[i + 1];
+            _letterIsLit[i] = _letterIsLit[i + 1];
         }
-        letterIsLit[^1] = temp;
+        _letterIsLit[^1] = temp;
     }
 
     protected virtual void AllLit()
@@ -168,14 +167,17 @@ public class ToggleableLetters : EventSender, INeedReset
         }
     }
 
-    public override void ResetState()
+    public override void ExternalReset()
     {
-        _allLit = false;
-        for (int i = 0; i < letterIsLit.Length; i++)
+        ResetState();
+    }
+    
+    private void ResetState()
+    {
+        for (int i = 0; i < _letterIsLit.Length; i++)
         {
-            letterIsLit[i] = false;
+            _letterIsLit[i] = false;
         }
         UpdateMaterials();
     }
-
 }

@@ -87,7 +87,7 @@ public class Flipper : MonoBehaviour
             foreach (GameObject ball in GM.inst.ballDispenser.GetActiveBalls())
             {
                 Ball ballComp = ball.GetComponent<Ball>();
-                Rigidbody2D rb = ballComp.ball2D.GetComponent<Rigidbody2D>();                
+                Rigidbody2D rb = ballComp.rb2D;                
                 
                 
                 // float radius = ball.GetComponent<CircleCollider2D>().radius;
@@ -108,7 +108,7 @@ public class Flipper : MonoBehaviour
                     {
                         kinematicBalls.Remove(ball);                        
                         Ball.StoredBallInfo stored = ballComp.MakeDynamic();
-                        rb.velocity += stored.velocity;
+                        rb.velocity += stored.Velocity;
                     }
                 }
             }
@@ -118,10 +118,10 @@ public class Flipper : MonoBehaviour
             foreach (GameObject ball in kinematicBalls)
             {                
                 Ball ballComp = ball.GetComponent<Ball>();
-                Rigidbody2D rb = ballComp.ball2D.GetComponent<Rigidbody2D>();
+                Rigidbody2D rb = ballComp.rb2D;
                 Ball.StoredBallInfo stored = ballComp.MakeDynamic();
                 
-                rb.velocity += stored.velocity;
+                rb.velocity += stored.Velocity;
             }
             kinematicBalls = new List<GameObject>();
             ballsAlreadyHit = new List<GameObject>();
@@ -137,7 +137,7 @@ public class Flipper : MonoBehaviour
             testObj.GetComponent<Rigidbody2D>().rotation = flipperNextAngle + objLink.baseRotation2D;
 
             // Rigidbody2D rb = ball.GetComponent<Rigidbody2D>();
-            float radius = ball.ball2D.GetComponent<CircleCollider2D>().radius;
+            float radius = ball.radius;
             Vector2 nextPos = ballPos + ballV * Time.fixedDeltaTime;
             Vector2 direction = (ballPos - nextPos).normalized;
             float distance = (ballPos - nextPos).magnitude;
@@ -147,7 +147,7 @@ public class Flipper : MonoBehaviour
 
         Vector2 CalcHitVelocity(RaycastHit2D hit, Ball ball, float flipperPrevAngle, float flipperNextAngle, bool canSetKinematic = true)
         {
-            Rigidbody2D rb = ball.ball2D.GetComponent<Rigidbody2D>();
+            Rigidbody2D rb = ball.rb2D;
 
             // Find the surface point where the ball actually impacted
             RaycastHit2D outHit = Physics2D.Raycast(hit.point + hit.normal * ball.radius * 2f, -hit.normal, ball.radius * 2.1f, LayerMask.GetMask("FlipperTest"));
@@ -228,7 +228,7 @@ public class Flipper : MonoBehaviour
                 secondFlipVal = fVecs[i+1].flipValue;
                 
                 
-                if (stored.flipperValue >= firstFlipVal && stored.flipperValue <= secondFlipVal)
+                if (stored.FlipperValue >= firstFlipVal && stored.FlipperValue <= secondFlipVal)
                 {
                     insideFVecs = true;
                     break;
@@ -239,11 +239,11 @@ public class Flipper : MonoBehaviour
             
             if (insideFVecs)
             {
-                flipVal = Mathf.InverseLerp(firstFlipVal, secondFlipVal, stored.flipperValue);
+                flipVal = Mathf.InverseLerp(firstFlipVal, secondFlipVal, stored.FlipperValue);
             }
             else
             {
-                if (stored.flipperValue < fVecs[0].flipValue)
+                if (stored.FlipperValue < fVecs[0].flipValue)
                 {
                     flipVal = fVecs[0].flipValue;
                 }
@@ -253,7 +253,7 @@ public class Flipper : MonoBehaviour
                 }
             }
 
-            float distFromPivot = Vector2.Distance(stored.position, objLink.obj2D.GetComponent<Rigidbody2D>().position);
+            float distFromPivot = Vector2.Distance(stored.Position, objLink.obj2D.GetComponent<Rigidbody2D>().position);
 
             float firstPoint = 0;
             int firstPositionIndex = -1;

@@ -10,6 +10,8 @@ using UnityEngine.UI;
 
 public class InputMan : MonoBehaviour
 {
+    // Translates traditional keyboard/gamepad input and touchscreen input to a unified set of fields. 
+    
     public InputActionReference leftFlipperAction;
     public InputActionReference rightFlipperAction;
     public InputActionReference leftNudgeAction;

@@ -7,17 +7,15 @@ public class SequentialTriggers : EventSender, INeedReset
 {
     public EventSender[] sequentialTriggers;
     
-    public float resetDecayTime = 4f;
-    public bool reversable;
+    public float resetDecayTime = 4f;   // How much time before the sequence automatically resets
+    public bool reversable;             // Can the triggers be triggered in reverse order?
+    public int scoreValue;              // Should this object give points for completion? 
+    public Vector3 scorePosition;       // What position will be passed along in the event info?
     
-    private int _nextStep;
-    private float _resetTimer;
-    private bool _reverseDir;
-
-    public int scoreValue;
-    public Vector3 scorePosition;
+    private int _nextStep;              // The next trigger expected in the sequence. -1 means no sequence in progress.
+    private float _resetTimer;      
+    private bool _goingInReverse;       // A reverse sequence is in progress
     
-
     void Start()
     {
         foreach (EventSender sender in sequentialTriggers)
@@ -59,14 +57,14 @@ public class SequentialTriggers : EventSender, INeedReset
         else if (id == 0)
         {
             // Ball has hit the first trigger in the sequence after previously failing to complete it.
-            _reverseDir = false;
+            _goingInReverse = false;
             _nextStep = 0;
             Progress();
         }
         else if (reversable && id == sequentialTriggers.Length - 1)
         {
             // If allowed, start a reversed sequence.
-            _reverseDir = true;
+            _goingInReverse = true;
             _nextStep = sequentialTriggers.Length - 1;
             Progress();
         }
@@ -80,12 +78,12 @@ public class SequentialTriggers : EventSender, INeedReset
 
     void Progress()
     {
-        EventInfo scoreEventInfo = new EventInfo();
+        EventInfo scoreEventInfo;
         
-        if (_reverseDir)
+        if (_goingInReverse)
         {
             _nextStep--;
-            if (_nextStep < 0)
+            if (_nextStep < 0)  // Sequence completed?
             {
                 if (scoreValue > 0)
                 {
@@ -96,7 +94,7 @@ public class SequentialTriggers : EventSender, INeedReset
                     }
                     boardEvent.Invoke(scoreEventInfo);
                 }
-                boardEvent.Invoke(scoreEventInfo);
+
                 boardEvent.Invoke(new EventInfo(EventType.Trigger));
                 _nextStep = -1;
             }
@@ -115,8 +113,7 @@ public class SequentialTriggers : EventSender, INeedReset
                     }
                     boardEvent.Invoke(scoreEventInfo);
                 }
-                boardEvent.Invoke(scoreEventInfo);
-                boardEvent.Invoke(new EventInfo(EventType.Trigger));
+                boardEvent.Invoke(new EventInfo(this, EventType.Trigger));
                 _nextStep = -1;
             }
         }

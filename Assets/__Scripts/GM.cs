@@ -12,12 +12,11 @@ using static EventSender;
 
 public class GM : MonoBehaviour
 {
+    public static GM inst { get; private set; }
 
-    public static GM inst;
-    public bool paused;
-    public List<string> allLayers;
-
-
+    public bool gamePaused { get; private set; }
+    [FormerlySerializedAs("allLayers")] public List<string> collisionLayers;
+    
     public Vector3 offset2D;
     public GameObject simpleTriggerPrefab;
     public Board board;
@@ -99,6 +98,9 @@ public class GM : MonoBehaviour
         Screen.autorotateToPortrait = false;
         Screen.autorotateToPortraitUpsideDown = false;
         Screen.orientation = ScreenOrientation.AutoRotation;
+#if UNITY_EDITOR
+        musicSource.mute = true;     
+#endif
     }
 
 
@@ -144,7 +146,7 @@ public class GM : MonoBehaviour
         if (mode == GameMode.Shop) 
             return;
         
-        if (paused)
+        if (gamePaused)
         {
             return;
         }
@@ -329,7 +331,15 @@ public class GM : MonoBehaviour
                 coinCount += (int)info.Data;
                 break;
             case EventSender.EventType.AddPoints:
-                AddScore((int)info.Data, true, info);
+                try
+                {
+                    AddScore((int)info.Data, true, info);
+                }
+                catch (System.Exception e)
+                {
+                    print(info.Data);
+                }
+                
                 break;
             case EventSender.EventType.AddPointsNoMult:
                 AddScore((int)info.Data, false, info);
@@ -605,17 +615,20 @@ public class GM : MonoBehaviour
             gameOverWin.gameObject.SetActive(true);
             gameOverWin.scoreText.text = "Final Score: " + _currentScore + "\nPress any key to restart";
         }
-
-        _timeSecondsToAdd += (int)(_timePerRound + _permaTimeBonus);
-
-        _prevTargetScore = _targetScore;
-        _targetScore = (int)(_targetScoreBase * _round * (1f + .25f * (_round - 1))); 
-        dotMatrixDisplay.UpdateTargetScoreTex(_targetScore);
-        dotMatrixDisplay.UpdateLevelTex(_round, _totalRounds);
-        if (scoreLog)
+        else
         {
-            scoreLog.NextRound();
+            _timeSecondsToAdd += (int)(_timePerRound + _permaTimeBonus);
+
+            _prevTargetScore = _targetScore;
+            _targetScore = (int)(_targetScoreBase * _round * (1f + .25f * (_round - 1))); 
+            dotMatrixDisplay.UpdateTargetScoreTex(_targetScore);
+            dotMatrixDisplay.UpdateLevelTex(_round, _totalRounds);
+            if (scoreLog)
+            {
+                scoreLog.NextRound();
+            }
         }
+
     }
     
     void AddScore(int score, bool useMult, EventInfo info = null)

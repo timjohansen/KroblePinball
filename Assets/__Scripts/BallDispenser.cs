@@ -97,7 +97,7 @@ public class BallDispenser : EventSender, ITriggerReceiver, INeedReset
         GameObject ballToSpawn = _inactiveBalls.Pop();
         ballToSpawn.SetActive(true);
         ballToSpawn.gameObject.GetComponent<Ball>().ball3D.GetComponent<TrailRenderer>().emitting = true;
-        ballToSpawn.GetComponent<Ball>().ball2D.transform.position = ballSpawnLoc.transform.position;
+        ballToSpawn.GetComponent<Ball>().SetPosition2D(ballSpawnLoc.transform.position);
         ballToSpawn.GetComponent<Ball>().ChangeLayer("Layer1");
         _activeBalls.Add(ballToSpawn);
         _queuedBalls--;

@@ -6,20 +6,22 @@ using UnityEngine.InputSystem;
 
 public class ArrowLights : MonoBehaviour, INeedReset
 {
+    // Manages the arrow lights sitting at the base of each upgradable chute. The stage variable indicates which
+    // arrow is currently blinking (0 to arrowCount) and arrowCount + 1 causes all arrows to blink rapidly. 
+    
     public int arrowCount;
     public ParticleSystem upgradeParticles;
-
+    
     private Renderer _renderer;
     private Color _offColor = new Color(0.2f, 0.2f, 0.2f);
     private int _stage;
+    private float _normalBlinkSpeed = 1f;
     
-    private float _blinkSpeed = 1f;
     public bool testMode = false;
     private int _testStage = 0;
-    
+
     void Start()
     {
-        // _blinkDurationHalf = _blinkDuration / 2f;
         _renderer = GetComponent<Renderer>();
         List<Material> mats = new();
         _renderer.GetMaterials(mats);
@@ -27,6 +29,7 @@ public class ArrowLights : MonoBehaviour, INeedReset
         {
             mat.SetColor("_Color_OFF", _offColor);
         }
+
         SetLightStage(0);
     }
 
@@ -41,9 +44,11 @@ public class ArrowLights : MonoBehaviour, INeedReset
         if (testMode && Keyboard.current.digit0Key.wasPressedThisFrame)
         {
             _testStage++;
+            _testStage %= arrowCount + 1;
             SetLightStage(_testStage);
         }
     }
+
     public void SetLightStage(int newStage)
     {
         if (newStage > arrowCount)
@@ -51,8 +56,9 @@ public class ArrowLights : MonoBehaviour, INeedReset
             Debug.LogError("Stage out of range", gameObject);
             return;
         }
-        
-        _stage = newStage;;
+
+        _stage = newStage;
+        ;
         UpdateMaterials();
     }
 
@@ -62,23 +68,25 @@ public class ArrowLights : MonoBehaviour, INeedReset
         {
             newLevel = GM.inst.levelColors.Length - 1;
         }
-        
+
         List<Material> mats = new();
         _renderer.GetMaterials(mats);
-        for (int i = 1; i < arrowCount + 1; i++)
+        for (int i = 0; i < arrowCount; i++)
         {
             mats[i].SetColor("_Color_ON", GM.inst.levelColors[newLevel]);
         }
+
         var settings = upgradeParticles.main;
         Color newCol = GM.inst.levelColors[newLevel];
         newCol.a = 1f;
         settings.startColor = new ParticleSystem.MinMaxGradient(newCol);
-        
+
 
         if (newLevel > 0)
         {
             upgradeParticles.Play();
         }
+
         UpdateMaterials();
     }
 
@@ -89,11 +97,11 @@ public class ArrowLights : MonoBehaviour, INeedReset
 
         if (_stage == arrowCount)
         {
-            for (int i = 1; i < arrowCount + 1; i++)
+            for (int i = 0; i < arrowCount; i++)
             {
-                mats[i].SetFloat("_BlinkSpeed", _blinkSpeed * 3f);
+                mats[i].SetFloat("_BlinkSpeed", _normalBlinkSpeed * 3f);
                 mats[i].SetInt("_LightOn", 1);
-                mats[i].SetInt("_BlinkType", 1);
+                mats[i].SetInt("_BlinkType", 2);
             }
         }
         else
@@ -102,22 +110,17 @@ public class ArrowLights : MonoBehaviour, INeedReset
             {
                 if (_stage == i)
                 {
-                    mats[i + 1].SetFloat("_BlinkSpeed", _blinkSpeed);
-                    mats[i + 1].SetInt("_LightOn", 1);
-                    mats[i + 1].SetInt("_BlinkType", 0);
-                }
-                else if (_stage > i)
-                {
-                    mats[i + 1].SetInt("_LightOn", 1);
-                    mats[i + 1].SetInt("_BlinkType", 2);
+                    mats[i].SetInt("_LightOn", 1);
                 }
                 else
                 {
-                    mats[i + 1].SetInt("_LightOn", 0);
-                    mats[i + 1].SetInt("_BlinkType", 0);
+                    mats[i].SetInt("_LightOn", 0);
                 }
+                mats[i].SetFloat("_BlinkSpeed", _normalBlinkSpeed);
+                mats[i].SetInt("_BlinkType", 0);
             }
         }
+
         _renderer.SetMaterials(mats);
     }
 }

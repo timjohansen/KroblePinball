@@ -5,23 +5,28 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 public class JetBumperMan : EventSender, INeedReset
 {
-    public int level;
-    public int hitCount;
-    public int hitCountTarget;
-    public int hitTargetBase = 10;
-    public float hitTargetLevelMultiplier = 1f;
-    public int scoreBase = 100;
-    public float scoreLevelMultiplier = .75f;
-
-    public GameObject obj3D;
+    // Handles combined scoring and upgrading for any number of bumper objects. 
+    
+    public int hitCountTargetBase = 10;         // Hits needed to upgrade to next level
+    public float hitTargetLevelMultiplier = 1f; // Rate of increase per level
+    public int scoreBase = 100;                 // Score given per bumper hit
+    public float scoreLevelMultiplier = .75f;   // Rate of increase per level
+    
+    public bool testMode;
+    
     public RadialMeter meter;
     public EventSender[] bumperSenders;
-    
     public ParticleSystem upgradeParticles;
-    public bool testModePressJ;
+    
+    private int _level;
+    private int _hitCount;
+    private int _hitCountTarget;
+    
+    
 
     protected void Start()
     {
@@ -34,35 +39,37 @@ public class JetBumperMan : EventSender, INeedReset
 
     void Update()
     {
-        if (testModePressJ && Keyboard.current.jKey.wasPressedThisFrame)
+#if (UNITY_EDITOR)
+        if (testMode && Keyboard.current.jKey.wasPressedThisFrame)
         {
             Upgrade(1);
         }
+#endif
     }
     
     public void ResetForNewGame()
     {
         SetLevel(0);
-        hitCount = 0;
-        hitCountTarget = hitTargetBase;
-
+        _hitCount = 0;
+        _hitCountTarget = hitCountTargetBase;
     }
 
     void OnBumperHit(EventInfo info)
     {
-        hitCount++;
-        EventInfo pointEventInfo = new EventInfo(this, EventType.AddPoints, (int)(scoreBase * (level + 1) * scoreLevelMultiplier));
+        _hitCount++;
+        EventInfo pointEventInfo = new EventInfo(this, EventType.AddPoints, (int)(scoreBase * (_level + 1) * scoreLevelMultiplier));
         if (info.Position2D.HasValue)
         {
+            // Forwards the location of the impact if present, used for effects.
             pointEventInfo.Position2D = info.Position2D.Value;
         }
         boardEvent.Invoke(pointEventInfo);
 
-        if (hitCount >= hitCountTarget)
+        if (_hitCount >= _hitCountTarget)
         {
             Upgrade(1);
         }
-        meter.SetPercentage((float)hitCount / hitCountTarget);
+        meter.SetPercentage((float)_hitCount / _hitCountTarget);
     }
 
     void SetLevel(int newLevel)
@@ -71,17 +78,17 @@ public class JetBumperMan : EventSender, INeedReset
         {
             newLevel = GM.inst.levelColors.Length - 1;
         }
-        level = newLevel;
-        hitCount = 0;
-        hitCountTarget = (int)(hitTargetBase * (level + 1) * hitTargetLevelMultiplier);
-
+        _level = newLevel;
+        _hitCount = 0;
+        _hitCountTarget = (int)(hitCountTargetBase * (_level + 1) * hitTargetLevelMultiplier);
+        
         meter.SetPercentage(0f);
         
-        // Gets the colors for the current and next level while ensuring the indices stays within array bounds
+        // Set meter colors
         Color backgroundColor;
-        if (level > 0)
+        if (_level > 0)
         {
-            backgroundColor = GM.inst.levelColors[level];
+            backgroundColor = GM.inst.levelColors[_level - 1];
             backgroundColor = new Color(backgroundColor.r, backgroundColor.g, backgroundColor.b, 1f);
         }
         else
@@ -89,29 +96,30 @@ public class JetBumperMan : EventSender, INeedReset
             backgroundColor = new Color(1f, 1f, 1f, 0f);    
         }
                 
-        Color progressColor = GM.inst.levelColors[Math.Clamp(level + 1, 0, GM.inst.levelColors.Length - 1)];    
+        Color progressColor = GM.inst.levelColors[_level];    
         progressColor = new Color(progressColor.r, progressColor.g, progressColor.b, 1f);
         
         meter.SetColors(progressColor, backgroundColor);
         
-        if (obj3D && level < GM.inst.levelColors.Length)
+        // Change material color and trigger upgrade particles
+        ObjectLink objLink = GetComponent<ObjectLink>();
+        if (objLink && objLink.obj3D)
         {
-            obj3D.GetComponent<Renderer>().material.SetColor("_Color_ON", GM.inst.levelColors[newLevel]);
-            var settings = upgradeParticles.main;
-            Color newCol = GM.inst.levelColors[newLevel];
-            newCol.a = 1f;
-            settings.startColor = new ParticleSystem.MinMaxGradient(newCol);
-        }
-        
-        if (level > 0 && upgradeParticles)
-        {
-            upgradeParticles.Play();
+            objLink.obj3D.GetComponent<Renderer>().material.SetColor("_Color_ON", GM.inst.levelColors[_level]);
+            if (upgradeParticles && _level > 0)
+            {
+                var particleSettings = upgradeParticles.main;
+                Color newCol = GM.inst.levelColors[_level];
+                newCol.a = 1f;
+                particleSettings.startColor = new ParticleSystem.MinMaxGradient(newCol);   
+                upgradeParticles.Play();
+            }
         }
     }
     
     public void Upgrade(int numLevels)
     {
-        SetLevel(level + numLevels);
+        SetLevel(_level + numLevels);
         
         boardEvent.Invoke(new EventInfo(this, EventType.PlaySoundNoReverb, "level_up_1"));
         DotMatrixDisplay.Message message = new DotMatrixDisplay.Message(
@@ -129,10 +137,5 @@ public class JetBumperMan : EventSender, INeedReset
             }
         );
         boardEvent.Invoke(new EventInfo(this, EventType.ShowMessage, message));
-    }
-    
-    public override void ResetState()
-    {
-        // throw new System.NotImplementedException();
     }
 }
