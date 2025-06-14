@@ -95,8 +95,8 @@ public class GM : MonoBehaviour
         inputMan = GetComponent<InputMan>();
         _cameraController = FindObjectOfType<CameraController>();
         
-        Screen.autorotateToPortrait = false;
-        Screen.autorotateToPortraitUpsideDown = false;
+        // Screen.autorotateToPortrait = false;
+        // Screen.autorotateToPortraitUpsideDown = false;
         Screen.orientation = ScreenOrientation.AutoRotation;
 #if UNITY_EDITOR
         musicSource.mute = true;     

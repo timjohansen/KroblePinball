@@ -216,11 +216,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5417527975666051242, guid: c1906d8aa3863493083981efc13ebb2a, type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.7071068
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 5417527975666051242, guid: c1906d8aa3863493083981efc13ebb2a, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.7071068
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 5440245871242044364, guid: c1906d8aa3863493083981efc13ebb2a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -270,6 +270,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 8582976310269836333, guid: c1906d8aa3863493083981efc13ebb2a, type: 3}
+      propertyPath: dropTargetRenderer
+      value: 
+      objectReference: {fileID: 851885787}
     - target: {fileID: 8773936860513097262, guid: c1906d8aa3863493083981efc13ebb2a, type: 3}
       propertyPath: m_Layer
       value: 7
@@ -4061,6 +4065,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 8582976310269836333, guid: c1906d8aa3863493083981efc13ebb2a, type: 3}
+      propertyPath: dropTargetRenderer
+      value: 
+      objectReference: {fileID: 876934501}
     - target: {fileID: 8773936860513097262, guid: c1906d8aa3863493083981efc13ebb2a, type: 3}
       propertyPath: m_Layer
       value: 7
@@ -6712,7 +6720,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.9931128, z: -0.11716214, w: 0}
   m_LocalPosition: {x: 0, y: -16.63, z: 2.37}
-  m_LocalScale: {x: 9, y: 4.5, z: 4.5}
+  m_LocalScale: {x: 13, y: 6.5, z: 6.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1122556325}
@@ -8555,16 +8563,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9348d28e082da440388642e15be69788, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boardEvent:
-    m_PersistentCalls:
-      m_Calls: []
-    m_CallsDirty: 1
-  upgradeTrigger: {fileID: 1506355680}
-  spinnerObjs:
-  - {fileID: 1406441122}
-  - {fileID: 384141235}
-  levelUpPointBonus: 0
-  testMode: 1
 --- !u!4 &641734799
 Transform:
   m_ObjectHideFlags: 0
@@ -9675,6 +9673,11 @@ MeshRenderer:
   m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: cdf16ed4bc16c434ba3b37616763993b, type: 3}
   m_PrefabInstance: {fileID: 831298899}
   m_PrefabAsset: {fileID: 0}
+--- !u!137 &851885787 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 6393822331722912949, guid: c1906d8aa3863493083981efc13ebb2a, type: 3}
+  m_PrefabInstance: {fileID: 14416021}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &854010347
 GameObject:
   m_ObjectHideFlags: 0
@@ -10701,6 +10704,16 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.03, y: 0.04}
   m_EdgeRadius: 0
+--- !u!137 &876934501 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 6393822331722912949, guid: c1906d8aa3863493083981efc13ebb2a, type: 3}
+  m_PrefabInstance: {fileID: 298941644}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &879717244 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 6393822331722912949, guid: c1906d8aa3863493083981efc13ebb2a, type: 3}
+  m_PrefabInstance: {fileID: 2048337652}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &883169914
 GameObject:
   m_ObjectHideFlags: 0
@@ -11404,7 +11417,7 @@ Camera:
     height: 1
   near clip plane: 0.5
   far clip plane: 25
-  field of view: 70
+  field of view: 110.4
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -11430,13 +11443,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.60876137, y: 0, z: 0, w: 0.7933534}
+  m_LocalRotation: {x: 0.6306758, y: 0, z: 0, w: 0.7760464}
   m_LocalPosition: {x: 0, y: 4.4, z: -3.45}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 214116927}
-  m_LocalEulerAnglesHint: {x: 75, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 78.2, y: 0, z: 0}
 --- !u!1001 &966981764
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11969,9 +11982,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 210be22b741b147c1b56d425379ffe54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 0.1
-  ball2D: {fileID: 0}
-  _rb: {fileID: 0}
 --- !u!114 &1018274866
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11984,9 +11994,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 210be22b741b147c1b56d425379ffe54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 0.1
-  ball2D: {fileID: 0}
-  _rb: {fileID: 0}
 --- !u!1 &1021087104
 GameObject:
   m_ObjectHideFlags: 0
@@ -20377,15 +20384,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03dbbf640b2ae4e49a69ac842539aa4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreTexWidth: 128
-  scoreTexHeight: 24
-  goalTexWidth: 128
-  goalTexHeight: 10
-  timeTexWidth: 80
-  timeTexHeight: 24
-  levelTexWidth: 128
-  levelTexHeight: 10
-  digitTexArray:
+  scoreTextureSize: {x: 128, y: 24}
+  goalTextureSize: {x: 128, y: 10}
+  timeTextureSize: {x: 80, y: 24}
+  levelTextureSize: {x: 128, y: 10}
+  largeDigitTexArray:
   - {fileID: 2800000, guid: 263cd2deea6294dc78503ae0065c184f, type: 3}
   - {fileID: 2800000, guid: 9ab49b5dad7d54b90b56d0a6a163cfff, type: 3}
   - {fileID: 2800000, guid: b9a96010022dc48238f43513c5d9247b, type: 3}
@@ -20396,22 +20399,8 @@ MonoBehaviour:
   - {fileID: 2800000, guid: 3967b4c939f1e4fef9d2ea3823984b3a, type: 3}
   - {fileID: 2800000, guid: 70047a5cc4681403f95578428c751ae4, type: 3}
   - {fileID: 2800000, guid: 244cf4b5b990243a8acc11487a96510c, type: 3}
-  commaTex: {fileID: 2800000, guid: 391808ff389744433beabd3af1b5df10, type: 3}
-  colonTex: {fileID: 2800000, guid: 674bc8f840aed4b29b66459e3d30d3ba, type: 3}
-  smallDigitTexArray:
-  - {fileID: 2800000, guid: e84822346d88f42d58af8f5a377ec3f5, type: 3}
-  - {fileID: 2800000, guid: e448751de283947beb6b19d4be0d81a6, type: 3}
-  - {fileID: 2800000, guid: af845a3696a9f4a3088adf50eed0e0ae, type: 3}
-  - {fileID: 2800000, guid: e2f2461bb53154418840a30125818580, type: 3}
-  - {fileID: 2800000, guid: 014dfea06482244f8b2fa88a0bf6ffc8, type: 3}
-  - {fileID: 2800000, guid: 449812afb6b6e429d9b95192622335bf, type: 3}
-  - {fileID: 2800000, guid: 62066f5a24a4b4edab41196cb7dfb74a, type: 3}
-  - {fileID: 2800000, guid: 5eafee51422a9432783316b07ac2276a, type: 3}
-  - {fileID: 2800000, guid: 0cb1d4103f16549bfbc5363f7ea1b45e, type: 3}
-  - {fileID: 2800000, guid: 1211372d192774d1c9fb4dd3f188a63e, type: 3}
-  smallCommaTex: {fileID: 2800000, guid: 7357a6012bd154464bc4efd197a188f2, type: 3}
-  smallGoalTex: {fileID: 2800000, guid: 41d1235d3a65e4c82980f1c7579a01cc, type: 3}
-  smallLevelTex: {fileID: 2800000, guid: c20ca9b8e335047698d5be0f0d7b1384, type: 3}
+  largeCommaTex: {fileID: 2800000, guid: 391808ff389744433beabd3af1b5df10, type: 3}
+  largeColonTex: {fileID: 2800000, guid: 674bc8f840aed4b29b66459e3d30d3ba, type: 3}
   wordTextures:
     entries:
     - name: 1More
@@ -20476,6 +20465,20 @@ MonoBehaviour:
       obj: {fileID: 2800000, guid: ca2439e655bcc407aac89c94a1601a41, type: 3}
     - name: Level
       obj: {fileID: 2800000, guid: 4a732ad5c1dd646a0923a0cf6eb612e7, type: 3}
+  smallDigitTexArray:
+  - {fileID: 2800000, guid: e84822346d88f42d58af8f5a377ec3f5, type: 3}
+  - {fileID: 2800000, guid: e448751de283947beb6b19d4be0d81a6, type: 3}
+  - {fileID: 2800000, guid: af845a3696a9f4a3088adf50eed0e0ae, type: 3}
+  - {fileID: 2800000, guid: e2f2461bb53154418840a30125818580, type: 3}
+  - {fileID: 2800000, guid: 014dfea06482244f8b2fa88a0bf6ffc8, type: 3}
+  - {fileID: 2800000, guid: 449812afb6b6e429d9b95192622335bf, type: 3}
+  - {fileID: 2800000, guid: 62066f5a24a4b4edab41196cb7dfb74a, type: 3}
+  - {fileID: 2800000, guid: 5eafee51422a9432783316b07ac2276a, type: 3}
+  - {fileID: 2800000, guid: 0cb1d4103f16549bfbc5363f7ea1b45e, type: 3}
+  - {fileID: 2800000, guid: 1211372d192774d1c9fb4dd3f188a63e, type: 3}
+  smallCommaTex: {fileID: 2800000, guid: 7357a6012bd154464bc4efd197a188f2, type: 3}
+  smallGoalTex: {fileID: 2800000, guid: 41d1235d3a65e4c82980f1c7579a01cc, type: 3}
+  smallLevelTex: {fileID: 2800000, guid: c20ca9b8e335047698d5be0f0d7b1384, type: 3}
 --- !u!4 &1841129518 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2679045c4bc404a4192ccf3b8aae21b7, type: 3}
@@ -22518,11 +22521,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5417527975666051242, guid: c1906d8aa3863493083981efc13ebb2a, type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.96363044
+      value: 0.96363044
       objectReference: {fileID: 0}
     - target: {fileID: 5417527975666051242, guid: c1906d8aa3863493083981efc13ebb2a, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.26723844
+      value: 0.26723838
       objectReference: {fileID: 0}
     - target: {fileID: 5440245871242044364, guid: c1906d8aa3863493083981efc13ebb2a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -22568,6 +22571,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 8582976310269836333, guid: c1906d8aa3863493083981efc13ebb2a, type: 3}
+      propertyPath: dropTargetRenderer
+      value: 
+      objectReference: {fileID: 879717244}
     - target: {fileID: 8773936860513097262, guid: c1906d8aa3863493083981efc13ebb2a, type: 3}
       propertyPath: m_Layer
       value: 7

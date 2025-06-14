@@ -7,7 +7,10 @@ using UnityEngine.Splines;
 public class CameraController : MonoBehaviour
 {
     private Camera _camera;
-    private Quaternion _gameRotation = Quaternion.Euler(75, 0, 0);
+    private Quaternion _portraitRotation = Quaternion.Euler(85f, 0, 0);
+    private Quaternion _landscapeRotation = Quaternion.Euler(75f, 0, 0);
+    private float _portraitFOV = 120f;
+    private float _landscapeFOV = 70f;
     
     // Scrolling variables
     private Vector3 _camTopPos = new(0f, 3.05f, -1.82f);    // The highest possible camera position
@@ -49,6 +52,8 @@ public class CameraController : MonoBehaviour
     
     void Update()
     {
+        var rot = Screen.width > Screen.height ? _landscapeRotation : _portraitRotation;
+        _camera.fieldOfView = Screen.width > Screen.height ? _landscapeFOV : _portraitFOV;
         if (GM.inst.mode == GM.GameMode.Title)
         {
             // Cycle through an array of locations while waiting for the game to start
@@ -62,6 +67,7 @@ public class CameraController : MonoBehaviour
             Vector3 posA = _titleCameraLocations[_titleCameraStep];
             Vector3 posB = _titleCameraLocations[(_titleCameraStep + 1) % _titleCameraLocations.Length];
             _camera.transform.localPosition = Vector3.Lerp(posA, posB, _titleAnimTime);
+            _camera.transform.localRotation = rot;
 
             return;
         }
@@ -127,7 +133,7 @@ public class CameraController : MonoBehaviour
         // The camera's speed is determined by distance from it and the ball/box.
         // If the ball/box is getting farther from the camera, the camera will move faster to catch up.
         float speed = 40f * distFromBox;
-        _camera.transform.localRotation = _gameRotation;
+        _camera.transform.localRotation = rot;
         _camera.transform.localPosition = Vector3.MoveTowards(_camera.transform.localPosition, camTarget, speed * Time.deltaTime);
     }
 

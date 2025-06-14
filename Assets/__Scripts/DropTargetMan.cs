@@ -7,35 +7,48 @@ using UnityEngine.Serialization;
 
 public class DropTargetMan : EventSender, INeedReset
 {
-    public DropTargets[] dropTargetObjs;
-    int _level;
-    bool[] _completed;
-    [FormerlySerializedAs("singleDropPoints")] public int initialSingleDropPoints = 250;
-    [FormerlySerializedAs("fullDropPoints")] public int initialFullDropPoints = 1000;
-    private int _currentSingleDropPoints;
-    private int _currentFullDropPoints;
-    public float levelMultiplier = .75f;
+    // Manages the combined scoring and upgrading for any number of DropTargets objects.
     
+    public DropTargets[] dropTargetObjs;
     public SimpleLight[] lightObjs;
     public AudioClip targetDownSound;
     public AudioClip targetsCompleteSound;
-    public bool testModePressDToUpgrade;
+    
+    public int initialSingleDropPoints = 250;
+    public int initialFullDropPoints = 1000;
+    public float levelMultiplier = .75f;
+    private int _currentSingleDropPoints;
+    private int _currentFullDropPoints;
+    
+    private bool _initialized;
+    private int _level;
+    private bool[] _completed;
+    
+    public bool testMode;
 
     void Start()
     {
         if (dropTargetObjs.Length != lightObjs.Length)
+        {
             Debug.LogError("Mismatched array lengths in DropTargetMan", gameObject);
+            return;
+        }
             
         for (int i = 0; i < dropTargetObjs.Length; i++)
         {
             dropTargetObjs[i].GetBoardEvent().AddListener(HandleEvent);
         }
         _completed = new bool[dropTargetObjs.Length];
+        _initialized = true;
+        
         ResetForNewGame();
     }
 
     public void ResetForNewGame()
     {
+        if (!_initialized)
+            return;
+        
         SetLevel(0);
         _currentSingleDropPoints = initialSingleDropPoints;
         _currentFullDropPoints = initialFullDropPoints;
@@ -43,14 +56,22 @@ public class DropTargetMan : EventSender, INeedReset
 
     void Update()
     {
-        if (testModePressDToUpgrade && Keyboard.current.dKey.wasPressedThisFrame)
+        if (!_initialized)
+            return;
+        
+#if (UNITY_EDITOR)
+        if (testMode && Keyboard.current.dKey.wasPressedThisFrame)
         {
             Upgrade(1);
         }
+#endif
     }
     
     void HandleEvent(EventInfo info)
     {
+        if (!_initialized)
+            return;
+        
         EventInfo hitInfo;
         if (info.Type != EventType.Trigger)
         {
@@ -64,8 +85,6 @@ public class DropTargetMan : EventSender, INeedReset
                 hitInfo.Position2D = info.Position2D.Value;
             }
             boardEvent.Invoke(hitInfo);
-            if (targetDownSound)
-                boardEvent.Invoke(new EventInfo(this, EventType.PlaySound, targetDownSound));
         }
         else
         {
@@ -86,8 +105,6 @@ public class DropTargetMan : EventSender, INeedReset
                 hitInfo.Position2D = info.Position2D.Value;
             }
             boardEvent.Invoke(hitInfo);
-            if (targetsCompleteSound)
-                boardEvent.Invoke(new EventInfo(this, EventType.PlaySound, targetsCompleteSound));
 
             bool allComplete = true;
             for (int i = 0; i < dropTargetObjs.Length; i++)
@@ -104,6 +121,9 @@ public class DropTargetMan : EventSender, INeedReset
 
     public void Upgrade(int levels)
     {
+        if (!_initialized)
+            return;
+        
         SetLevel(_level + levels);
         boardEvent.Invoke(new EventInfo(this, EventType.PlaySoundNoReverb, "level_up_1"));
         DotMatrixDisplay.Message message = new DotMatrixDisplay.Message(
@@ -122,6 +142,9 @@ public class DropTargetMan : EventSender, INeedReset
 
     void SetLevel(int newLevel)
     {
+        if (!_initialized)
+            return;
+        
         if (newLevel >= GM.inst.levelColors.Length)
         {
             newLevel = GM.inst.levelColors.Length - 1;
