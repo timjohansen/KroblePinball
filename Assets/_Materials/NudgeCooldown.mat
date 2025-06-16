@@ -75,7 +75,7 @@ Material:
     - _OcclusionStrength: 1
     - _Orientation: 0.5
     - _Parallax: 0.02
-    - _Percentage: 0.002786464
+    - _Percentage: 0.0024549896
     - _Radius: 0.25
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1

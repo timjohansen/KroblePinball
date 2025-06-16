@@ -67,13 +67,13 @@ public class ToggleableLetters : EventSender, INeedReset
         }
         else
         {
-            if (InputMan.inst.leftFlipperAction.action.WasPressedThisFrame())
+            if (InputMan.inst.leftFlipperPressedThisFrame)
             {
                 ShiftLeft();
                 UpdateMaterials();
             }
 
-            if (InputMan.inst.rightFlipperAction.action.WasPressedThisFrame())
+            if (InputMan.inst.rightFlipperPressedThisFrame)
             {
                 ShiftRight();
                 UpdateMaterials();

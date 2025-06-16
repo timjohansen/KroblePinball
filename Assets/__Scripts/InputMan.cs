@@ -28,7 +28,12 @@ public class InputMan : MonoBehaviour
     private PointerEventData _eventData;
     
     public bool leftFlipperPressed { get; private set; }
+    private bool _leftFlipperPrev;
+    
+    public bool leftFlipperPressedThisFrame { get; private set; }
     public bool rightFlipperPressed { get; private set; }
+    private bool _rightFlipperPrev;
+    public bool rightFlipperPressedThisFrame { get; private set; }
     public bool upNudgePressed { get; private set; }
     public bool leftNudgePressed { get; private set; }
     public bool rightNudgePressed { get; private set; }
@@ -58,7 +63,9 @@ public class InputMan : MonoBehaviour
     void Update()
     {
         leftFlipperPressed = false;
+        leftFlipperPressedThisFrame = false;
         rightFlipperPressed = false;
+        rightFlipperPressedThisFrame = false;
         upNudgePressed = false;
         leftNudgePressed = false;
         rightNudgePressed = false;
@@ -82,7 +89,9 @@ public class InputMan : MonoBehaviour
     {
         anyKeyPressed = anyKeyAction.action.IsPressed();
         leftFlipperPressed = leftFlipperAction.action.IsPressed();
+        leftFlipperPressedThisFrame = leftFlipperAction.action.WasPressedThisFrame();
         rightFlipperPressed = rightFlipperAction.action.IsPressed();
+        rightFlipperPressedThisFrame = rightFlipperAction.action.WasPressedThisFrame();
         upNudgePressed = upNudgeAction.action.IsPressed();
         leftNudgePressed = leftNudgeAction.action.IsPressed();
         rightNudgePressed = rightNudgeAction.action.IsPressed();
@@ -114,9 +123,17 @@ public class InputMan : MonoBehaviour
                 {
                     case "LeftFlipper":
                         leftFlipperPressed = true;
+                        if (!_leftFlipperPrev)
+                        {
+                            leftFlipperPressedThisFrame = true;
+                        }
                         break;
                     case "RightFlipper":
                         rightFlipperPressed = true;
+                        if (!_rightFlipperPrev)
+                        {
+                            rightFlipperPressedThisFrame = true;
+                        }
                         break;
                     case "LeftUpNudge":
                     case "RightUpNudge":
@@ -137,6 +154,8 @@ public class InputMan : MonoBehaviour
                 }
             }
         }
+        _leftFlipperPrev = leftFlipperPressed;
+        _rightFlipperPrev = rightFlipperPressed;
     }
     
 }
