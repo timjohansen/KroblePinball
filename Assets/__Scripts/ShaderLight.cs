@@ -21,12 +21,15 @@ public class ShaderLight : MonoBehaviour, INeedReset
     
     private Renderer _renderer;
     private List<Material> _materials = new List<Material>();
-    
-    void Start()
+
+    void Awake()
     {
         _renderer = GetComponent<Renderer>();
         _renderer.GetMaterials(_materials);
-        
+    }
+    
+    void Start()
+    {
         if (onEventSender)
             onEventSender.GetBoardEvent().AddListener(OnOnEvent);
         if (offEventSender)
