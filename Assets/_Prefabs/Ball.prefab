@@ -47,13 +47,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1afbbc5701aa64cb49e0d30a49e36e95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 0.1
-  ball2D: {fileID: 4592215719263235985}
+  ball2D: {fileID: 6619832787888057878}
   ball3D: {fileID: 3038515628614255340}
-  currentLayer: 0
-  currentSpeed: 0
-  touchingFlipper: 0
-  soundSpeedThreshold: 1
 --- !u!82 &4043901173286948716
 AudioSource:
   m_ObjectHideFlags: 0
@@ -316,14 +311,8 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5223057757031729508, guid: c3f310d7b9f7d4f4eaedc16d548fcc83, type: 3}
   m_PrefabInstance: {fileID: 8258522515447407680}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &4592215719263235985 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5559405278449404881, guid: c3f310d7b9f7d4f4eaedc16d548fcc83, type: 3}
+--- !u!1 &6619832787888057878 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2973066934633089622, guid: c3f310d7b9f7d4f4eaedc16d548fcc83, type: 3}
   m_PrefabInstance: {fileID: 8258522515447407680}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 112063ef8a453498b84261e7efef5144, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

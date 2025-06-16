@@ -34,16 +34,16 @@ public class FlipperPre : MonoBehaviour
 
         if (rightSide)
         {
-            flipperPressed = Board.inst.rightFlipperPressed;
+            flipperPressed = Flippers.inst.rightFlipperPressed;
 
-            flipperBaseRot = Board.inst.rightFlipBaseRot;
-            flipperMaxRot = Board.inst.rightFlipMaxRot;
+            flipperBaseRot = Flippers.inst.rightFlipBaseRot;
+            flipperMaxRot = Flippers.inst.rightFlipMaxRot;
         }
         else
         {
-            flipperPressed = Board.inst.leftFlipperPressed;
-            flipperBaseRot = Board.inst.leftFlipBaseRot;
-            flipperMaxRot = Board.inst.leftFlipMaxRot;
+            flipperPressed = Flippers.inst.leftFlipperPressed;
+            flipperBaseRot = Flippers.inst.leftFlipBaseRot;
+            flipperMaxRot = Flippers.inst.leftFlipMaxRot;
         }
         
         float prevRotateValue = rotateValue;
@@ -54,7 +54,7 @@ public class FlipperPre : MonoBehaviour
         {
             if (rotateValue < 1f)
             {
-                rotateValue = Mathf.MoveTowards(rotateValue, 1f, Board.inst.flipperSpeed * Time.fixedDeltaTime);
+                rotateValue = Mathf.MoveTowards(rotateValue, 1f, Flippers.inst.flipperSpeed * Time.fixedDeltaTime);
                 angle = Mathf.Lerp(flipperBaseRot, flipperMaxRot, rotateValue);
             }            
         }
@@ -62,7 +62,7 @@ public class FlipperPre : MonoBehaviour
         {
             if (rotateValue > 0f)
             {
-                rotateValue = Mathf.MoveTowards(rotateValue, 0f, Board.inst.flipperSpeed * Time.fixedDeltaTime);
+                rotateValue = Mathf.MoveTowards(rotateValue, 0f, Flippers.inst.flipperSpeed * Time.fixedDeltaTime);
                 angle = Mathf.Lerp(flipperBaseRot, flipperMaxRot, rotateValue);
             }
         }

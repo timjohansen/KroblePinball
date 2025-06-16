@@ -7,6 +7,8 @@ using UnityEngine.UI;
 
 public class Shop : EventSender
 {
+    // This class contains a roguelike style item shop for buying upgrades with coins. Currently not accessible in-game. 
+    
     RectTransform _mainTransform;
     public Image shopKeeper;
     private RectTransform _shopKeeperTransform;
@@ -87,7 +89,7 @@ public class Shop : EventSender
         switch (_state)
         {
             case ShopState.Open:
-                if (GM.inst.inputMan.leftFlipperAction.action.WasPressedThisFrame())
+                if (InputMan.inst.leftFlipperAction.action.WasPressedThisFrame())
                 {
                     if (_selectedSlot == 0)
                     {
@@ -99,7 +101,7 @@ public class Shop : EventSender
                     }
                     selector.rectTransform.anchoredPosition = new Vector2(_firstSlotXPos + _slotSpacing * _selectedSlot, selector.rectTransform.anchoredPosition.y);
                 }
-                else if (GM.inst.inputMan.rightFlipperAction.action.WasPressedThisFrame())
+                else if (InputMan.inst.rightFlipperAction.action.WasPressedThisFrame())
                 {
                     _selectedSlot = (_selectedSlot + 1) % 3;
                     selector.rectTransform.anchoredPosition = new Vector2(_firstSlotXPos + _slotSpacing * _selectedSlot, selector.rectTransform.anchoredPosition.y);
@@ -224,7 +226,7 @@ public class Shop : EventSender
     void Purchase(int slot)
     {
         ShopItem itemData = slots[slot].itemData;
-        GM.inst.ApplyItemEffect(itemData.effect, itemData.effectValue);
+        GM.inst.ApplyShopItemEffect(itemData.effect, itemData.effectValue);
         slots[slot].SetSold(true);
         GM.inst.coinCount -= slots[slot].itemData.price;
         boardEvent.Invoke(new EventInfo(this, EventType.PlaySoundNoReverb, "purchase"));

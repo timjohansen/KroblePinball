@@ -44,7 +44,7 @@ public class GameOver : MonoBehaviour
             scoreText.rectTransform.localPosition = Vector3.Lerp(textStart, textEnd, invTime);
         }
 
-        if (_animInTimer <= 0f && GM.inst.inputMan.anyKeyPressed)
+        if (_animInTimer <= 0f && InputMan.inst.anyKeyPressed)
         {
             GM.inst.StartNewGame();
             gameObject.SetActive(false);

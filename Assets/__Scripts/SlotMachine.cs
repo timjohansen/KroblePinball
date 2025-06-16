@@ -151,7 +151,7 @@ public class SlotMachine : EventSender
         switch (value)
         {
             case 0:
-                boardEvent.Invoke(new EventInfo(this, EventType.AddSaver, 25f));
+                boardEvent.Invoke(new EventInfo(this, EventType.AddSaver, 25));
                 message = new DotMatrixDisplay.Message(
                     new DotMatrixDisplay.DmdAnim[]
                     {

@@ -10,15 +10,7 @@ public class DropTargetMan : EventSender, INeedReset
     // Manages the combined scoring and upgrading for any number of DropTargets objects.
     
     public DropTargets[] dropTargetObjs;
-    public SimpleLight[] lightObjs;
-    public AudioClip targetDownSound;
-    public AudioClip targetsCompleteSound;
-    
-    public int initialSingleDropPoints = 250;
-    public int initialFullDropPoints = 1000;
-    public float levelMultiplier = .75f;
-    private int _currentSingleDropPoints;
-    private int _currentFullDropPoints;
+    public ShaderLight[] lightObjs;
     
     private bool _initialized;
     private int _level;
@@ -50,8 +42,6 @@ public class DropTargetMan : EventSender, INeedReset
             return;
         
         SetLevel(0);
-        _currentSingleDropPoints = initialSingleDropPoints;
-        _currentFullDropPoints = initialFullDropPoints;
     }
 
     void Update()
@@ -77,46 +67,29 @@ public class DropTargetMan : EventSender, INeedReset
         {
             return;
         }
-        if (info.Data == null)    // Single hit
+        
+        for (int i = 0; i < dropTargetObjs.Length; i++)
         {
-            hitInfo = new EventInfo(this, EventType.AddPoints, (int)(initialSingleDropPoints * (_level + 1) * levelMultiplier));
-            if (info.Position2D.HasValue)
+            if (dropTargetObjs[i] == info.Sender)
             {
-                hitInfo.Position2D = info.Position2D.Value;
-            }
-            boardEvent.Invoke(hitInfo);
-        }
-        else
-        {
-            string objStr = (string)info.Data;
-            for (int i = 0; i < dropTargetObjs.Length; i++)
-            {
-                if (dropTargetObjs[i].name == objStr)
-                {
-                    _completed[i] = true;
-                    lightObjs[i].LightOn();
-                    break;
-                }
-            }
-
-            hitInfo = new EventInfo(this, EventType.AddPoints, (int)(initialFullDropPoints * (_level + 1) * levelMultiplier));
-            if (info.Position2D.HasValue)
-            {
-                hitInfo.Position2D = info.Position2D.Value;
-            }
-            boardEvent.Invoke(hitInfo);
-
-            bool allComplete = true;
-            for (int i = 0; i < dropTargetObjs.Length; i++)
-            {
-                allComplete = allComplete && _completed[i];
-            }
-
-            if (allComplete)
-            {
-                Upgrade(1);
+                print("Sender:" + info.Sender.name);
+                _completed[i] = true;
+                lightObjs[i].SetState(true);
+                break;
             }
         }
+        
+        bool allComplete = true;
+        for (int i = 0; i < dropTargetObjs.Length; i++)
+        {
+            allComplete = allComplete && _completed[i];
+        }
+
+        if (allComplete)
+        {
+            Upgrade(1);
+        }
+        
     }
 
     public void Upgrade(int levels)
@@ -153,9 +126,9 @@ public class DropTargetMan : EventSender, INeedReset
         for (int i = 0; i < dropTargetObjs.Length; i++)
         {
             _completed[i] = false;
-            lightObjs[i].LightOff();
-            int levelIndex = _level % GM.inst.levelColors.Length;
-            lightObjs[i].SetColor(GM.inst.levelColors[levelIndex]);
+            lightObjs[i].SetState(false);
+            lightObjs[i].SetOnColor(GM.inst.levelColors[_level]);
+            
             dropTargetObjs[i].SetLevel(newLevel);
         }
     }

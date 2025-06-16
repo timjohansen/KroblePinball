@@ -6,7 +6,7 @@ using UnityEngine.Serialization;
 
 public class Ball : MonoBehaviour
 {
-    public Ball2D ball2D;
+    public GameObject ball2D;
     public GameObject ball3D;
     public Rigidbody2D rb2D { get; private set; }
     public float radius { get; private set; }
@@ -27,7 +27,7 @@ public class Ball : MonoBehaviour
 
     void Start()
     {
-        GM.inst.GetPauseEvent().AddListener(GamePause);
+        GM.inst.pauseEvent.AddListener(GamePause);
     }
     
     void Update()

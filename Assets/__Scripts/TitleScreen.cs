@@ -55,7 +55,7 @@ public class TitleScreen : MonoBehaviour
             pushStartText.rectTransform.localPosition = Vector3.Lerp(textStart, textEnd, invTime);
         }
 
-        if (GM.inst.inputMan.anyKeyPressed)
+        if (InputMan.inst.anyKeyPressed)
         {
             GM.inst.StartNewGame();
             gameObject.SetActive(false);

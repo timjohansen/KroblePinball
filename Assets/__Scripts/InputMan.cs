@@ -11,6 +11,7 @@ using UnityEngine.UI;
 public class InputMan : MonoBehaviour
 {
     // Translates traditional keyboard/gamepad input and touchscreen input to a unified set of fields. 
+    public static InputMan inst;
     
     public InputActionReference leftFlipperAction;
     public InputActionReference rightFlipperAction;
@@ -41,6 +42,8 @@ public class InputMan : MonoBehaviour
 
     void Awake()
     {
+        inst = this;
+        
         leftFlipperAction.action.Enable();
         rightFlipperAction.action.Enable();
         leftNudgeAction.action.Enable();

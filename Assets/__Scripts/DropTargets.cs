@@ -14,9 +14,11 @@ public class DropTargets : EventSender, ICollisionReceiver, INeedReset
     public AudioClip targetDownSound;
     public AudioClip targetsCompleteSound;
     public ParticleSystem upgradeParticles;
-    
-    public int singleDropScoreValue;
-    public int fullDropScoreValue;
+
+    private int _level = 0;
+    public int singleDropScoreValue = 500;
+    public int fullDropScoreValue = 1000;
+    public float levelMultiplier = 1f;
     public float bounceForce = 250f;            // How hard the ball should be bounced away after hitting a target
     
     private bool[] _targetDown;
@@ -61,7 +63,7 @@ public class DropTargets : EventSender, ICollisionReceiver, INeedReset
     {
         Vector3 pos = targetBones[index].transform.localPosition;        
         targetBones[index].transform.localPosition = new Vector3(pos.x, pos.y, _upZ);
-        _materials[index + 1].SetInt("_LightOn", 1);
+        _materials[index + 1].SetInt("_LightOn", 0);
         _materials[index + 1].SetInt("_BlinkType", 0);
     }
 
@@ -82,6 +84,7 @@ public class DropTargets : EventSender, ICollisionReceiver, INeedReset
             newLevel = GM.inst.levelColors.Length - 1;
         }
         
+        _level = newLevel;
         _materials[0].SetColor("_Color", GM.inst.levelColors[newLevel]);
         
         if (newLevel > 0)
@@ -106,13 +109,6 @@ public class DropTargets : EventSender, ICollisionReceiver, INeedReset
 
                 Vector2 direction = -collision.GetContact(0).normal;
                 collision.gameObject.GetComponentInParent<Ball>().AddImpulseForce(direction * bounceForce);
-
-                
-                EventInfo info = new EventInfo(this, EventType.Trigger)
-                {
-                    Position2D = collision.otherCollider.bounds.center
-                };
-                boardEvent.Invoke(info);
             }
         }
         bool allDown = true;
@@ -124,16 +120,23 @@ public class DropTargets : EventSender, ICollisionReceiver, INeedReset
                 break;
             }
         }
+
+        EventInfo scoreInfo = new EventInfo(this, EventType.AddPoints, 0)
+        {
+            Position2D = collision.otherCollider.bounds.center
+        };
+
         if (allDown)
         {
-            boardEvent.Invoke(new EventInfo(this, EventType.Trigger, name));
+            boardEvent.Invoke(new EventInfo(this, EventType.Trigger));
             if (targetsCompleteSound)
             {
                 _audioSource.PlayOneShot(targetsCompleteSound);
             }
             if (fullDropScoreValue > 0)
             {
-                boardEvent.Invoke(new EventInfo(this, EventType.AddPoints, fullDropScoreValue));
+                scoreInfo.Data = fullDropScoreValue * (1f + levelMultiplier) * _level;
+                boardEvent.Invoke(scoreInfo);
             }
             RaiseAll();
         }
@@ -145,7 +148,8 @@ public class DropTargets : EventSender, ICollisionReceiver, INeedReset
             }
             if (singleDropScoreValue > 0)
             {
-                boardEvent.Invoke(new EventInfo(this, EventType.AddPoints, singleDropScoreValue));
+                scoreInfo.Data = singleDropScoreValue * (1f + levelMultiplier) * _level;
+                boardEvent.Invoke(scoreInfo);
             }
         }
     }

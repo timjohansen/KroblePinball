@@ -69,7 +69,7 @@ public class Flipper : MonoBehaviour
 
     void Start()
     {
-        GM.inst.ballDispenser.GetBallDespawnEvent().AddListener(OnBallDespawn);
+        GM.inst.ballDispenser.ballDespawnEvent.AddListener(OnBallDespawn);
     }
     
     void FixedUpdate()
@@ -84,7 +84,7 @@ public class Flipper : MonoBehaviour
         if (swingingUp)
         {
             // Check all balls for collision next frame.
-            foreach (GameObject ball in GM.inst.ballDispenser.GetActiveBalls())
+            foreach (GameObject ball in GM.inst.ballDispenser.activeBalls)
             {
                 Ball ballComp = ball.GetComponent<Ball>();
                 Rigidbody2D rb = ballComp.rb2D;                

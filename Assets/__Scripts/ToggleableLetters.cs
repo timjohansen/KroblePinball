@@ -61,19 +61,19 @@ public class ToggleableLetters : EventSender, INeedReset
                 _timeUntilReset -= Time.deltaTime;
                 if (_timeUntilReset <= 0f)
                 {
-                    ExternalReset();
+                    ResetState();
                 }
             }
         }
         else
         {
-            if (GM.inst.inputMan.leftFlipperAction.action.WasPressedThisFrame())
+            if (InputMan.inst.leftFlipperAction.action.WasPressedThisFrame())
             {
                 ShiftLeft();
                 UpdateMaterials();
             }
 
-            if (GM.inst.inputMan.rightFlipperAction.action.WasPressedThisFrame())
+            if (InputMan.inst.rightFlipperAction.action.WasPressedThisFrame())
             {
                 ShiftRight();
                 UpdateMaterials();
@@ -174,6 +174,7 @@ public class ToggleableLetters : EventSender, INeedReset
     
     private void ResetState()
     {
+        _allLit = false;
         for (int i = 0; i < _letterIsLit.Length; i++)
         {
             _letterIsLit[i] = false;

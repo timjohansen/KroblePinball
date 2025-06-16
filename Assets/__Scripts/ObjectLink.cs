@@ -6,11 +6,17 @@ using UnityEditor;
 [ExecuteInEditMode]
 public class ObjectLink : MonoBehaviour
 {
+    // A class to link a 3D object with its underlying 2D object, and to generate colliders for the latter if needed.
+    // All physics and collision happens in 2D, with the 3D models converting 2D X and Y positions into 3D X and Z.
+    
+    // Polygon Colliders are generated from a text file exported from Blender with Polygon2DCreator.py
+    
     public GameObject obj3D;
     public GameObject obj2D;
-    public bool generateColliders;
-    public TextAsset textFile;
-    public Vector3 sharedRotation;
+    public bool generateColliders;                  // If checked, polygons will be generated from the following text file.
+                                                    // Checking and unchecking can also be used to update colliders.
+    public TextAsset textFile;                      // Text file from Blender
+    public Vector3 sharedRotation;                  // Used to rotate the two objects in sync.
     public bool invert3DRotation;
     public bool invert2DRotation;
 
@@ -98,11 +104,6 @@ public class ObjectLink : MonoBehaviour
 #if (UNITY_EDITOR) 
     public void TriggerUpdate(string reimportedAsset)
     {
-        // if (!obj2D)
-        // {
-        //     obj2D = new GameObject(gameObject.name + "_2D");
-        // }
-
         if (textFile && reimportedAsset == AssetDatabase.GetAssetPath(textFile))
         {
             OnValidate();

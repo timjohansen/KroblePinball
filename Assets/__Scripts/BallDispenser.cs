@@ -6,21 +6,19 @@ using UnityEngine.InputSystem;
 
 public class BallDispenser : EventSender, ITriggerReceiver, INeedReset
 {
-    public GameObject ballPrefab;
-    public GameObject ballSpawnLoc;
-    public int launcherStrength;
-    private bool _ballInChute;
-    List<GameObject> _activeBalls = new();
-    Stack<GameObject> _inactiveBalls = new();
-    private int _initialBallObjectCount;
-    private int _totalBallCount;
-    private UnityEvent<GameObject> _ballDespawnEvent;
-    public BoxCollider2D chuteArea;
-
-    private int _queuedBalls = 0;
-
-    private bool _multiball;
+    public GameObject ballPrefab;           // Prefab containing an object with the Ball class
+    public GameObject ballSpawnLoc;         // Empty object used to easily move the spawn location around
+    public int launcherStrength;            // How much force is applied in the upward direction on launch
+    
     public int ballsInPlay { get; private set; }
+    public List<GameObject> activeBalls { get; private set; } = new();
+    private Stack<GameObject> _inactiveBalls = new();   // Disabled ball objects waiting to be spawned 
+    private int _initialBallObjectCount = 5;            // How many pooled ball objects to initially create
+
+    public UnityEvent<GameObject> ballDespawnEvent { get; private set; }    // Needed by the flippers.
+                                                        
+    private int _queuedBalls = 0;           // Balls waiting to be spawned.
+    private bool _ballInChute;              // The script won't spawn another ball if one is currently in the chute.
 
     public Material[] ballMaterials;
 
@@ -32,7 +30,7 @@ public class BallDispenser : EventSender, ITriggerReceiver, INeedReset
             CreateBallObject();
         }
 
-        _ballDespawnEvent = new UnityEvent<GameObject>();
+        ballDespawnEvent = new UnityEvent<GameObject>();
     }
 
     void Start()
@@ -43,7 +41,7 @@ public class BallDispenser : EventSender, ITriggerReceiver, INeedReset
 
     public void ResetForNewGame()
     {
-        List<GameObject> objsToDespawn = new List<GameObject>(_activeBalls);
+        List<GameObject> objsToDespawn = new List<GameObject>(activeBalls);
         foreach (var obj in objsToDespawn)
         {
             DespawnBall(obj);
@@ -57,7 +55,6 @@ public class BallDispenser : EventSender, ITriggerReceiver, INeedReset
         GameObject newBall = Instantiate(ballPrefab, ballSpawnLoc.transform.position, Quaternion.identity);
         newBall.SetActive(false);
         _inactiveBalls.Push(newBall);
-        _totalBallCount++;
     }
 
     public void SpawnBall()
@@ -69,7 +66,7 @@ public class BallDispenser : EventSender, ITriggerReceiver, INeedReset
     {
         if (GM.inst.mode == GM.GameMode.Play || GM.inst.mode == GM.GameMode.Multiball)
         {
-            if (_activeBalls.Count + _queuedBalls < ballsInPlay)
+            if (activeBalls.Count + _queuedBalls < ballsInPlay)
             {
                 _queuedBalls++;
             }
@@ -99,30 +96,20 @@ public class BallDispenser : EventSender, ITriggerReceiver, INeedReset
         ballToSpawn.gameObject.GetComponent<Ball>().ball3D.GetComponent<TrailRenderer>().emitting = true;
         ballToSpawn.GetComponent<Ball>().SetPosition2D(ballSpawnLoc.transform.position);
         ballToSpawn.GetComponent<Ball>().ChangeLayer("Layer1");
-        _activeBalls.Add(ballToSpawn);
+        activeBalls.Add(ballToSpawn);
         _queuedBalls--;
     }
     
     public void DespawnBall(GameObject ballToDespawn)
     {
         ballsInPlay--;
-        _activeBalls.Remove(ballToDespawn);
+        activeBalls.Remove(ballToDespawn);
         _inactiveBalls.Push(ballToDespawn);
         ballToDespawn.gameObject.GetComponent<Ball>().ball3D.GetComponent<TrailRenderer>().emitting = false;
         ballToDespawn.SetActive(false);
-        _ballDespawnEvent.Invoke(ballToDespawn);
+        ballDespawnEvent.Invoke(ballToDespawn);
     }
-
-    public List<GameObject> GetActiveBalls()
-    {
-        return _activeBalls;
-    }
-
-    public UnityEvent<GameObject> GetBallDespawnEvent()
-    {
-        return _ballDespawnEvent;
-    }
-
+    
     public void SetBallMaterial(int index)
     {
         if (index < 0 || index >= ballMaterials.Length)
@@ -131,7 +118,7 @@ public class BallDispenser : EventSender, ITriggerReceiver, INeedReset
             return;
         }
 
-        foreach (GameObject ball in _activeBalls)
+        foreach (GameObject ball in activeBalls)
         {
             ball.GetComponent<Ball>().ball3D.GetComponent<Renderer>().material = ballMaterials[index];
         }

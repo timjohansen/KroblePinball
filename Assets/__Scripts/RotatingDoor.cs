@@ -26,7 +26,7 @@ public class RotatingDoor : MonoBehaviour, INeedReset
 
     public void ResetForNewGame()
     {
-        CloseDoor(new EventSender.EventInfo(null, EventSender.EventType.Trigger));
+        CloseDoor(new EventSender.EventInfo());
     }
 
     void Update()

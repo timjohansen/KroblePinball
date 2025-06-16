@@ -83,6 +83,7 @@ MonoBehaviour:
   upgradeParticles: {fileID: 6364720159072676690}
   singleDropScoreValue: 0
   fullDropScoreValue: 0
+  levelMultiplier: 1
   bounceForce: 250
 --- !u!82 &6107192896390448317
 AudioSource:

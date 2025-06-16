@@ -44,7 +44,7 @@ public class Countdown : MonoBehaviour
         
         else if (_timer > 0f)
         {
-            if (GM.inst.inputMan.anyKeyAction.action.WasPressedThisFrame())
+            if (InputMan.inst.anyKeyAction.action.WasPressedThisFrame())
             {
                 _timer = 0f;
             }
