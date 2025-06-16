@@ -8,6 +8,8 @@ using static EventSender;
 
 public class GM : MonoBehaviour
 {
+    // This class contains the main game code.
+    
     public static GM inst { get; private set; }
     
     // Geometry and playfield
